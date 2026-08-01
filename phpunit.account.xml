@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Account Unit">
+            <directory>tests/Unit/Accounts</directory>
+        </testsuite>
+        <testsuite name="Account Feature">
+            <directory>tests/Feature/Accounts</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <file>app/Concerns/AccountValidationRules.php</file>
+            <file>app/Concerns/HasEnumValues.php</file>
+            <file>app/Concerns/HasSearch.php</file>
+            <file>app/Concerns/HasSorting.php</file>
+            <file>app/Enums/CurrencyCode.php</file>
+            <file>app/Filters/AccountFilter.php</file>
+            <file>app/Http/Controllers/AccountController.php</file>
+            <file>app/Http/Requests/IndexAccountRequest.php</file>
+            <file>app/Http/Requests/StoreAccountRequest.php</file>
+            <file>app/Http/Requests/UpdateAccountRequest.php</file>
+            <file>app/Http/Resources/AccountResource.php</file>
+            <file>app/Models/Account.php</file>
+            <file>app/Policies/AccountPolicy.php</file>
+            <file>app/Services/AccountService.php</file>
+        </include>
+    </source>
+    <coverage pathCoverage="true" includeUncoveredFiles="true">
+        <report>
+            <html outputDirectory="build/coverage/account" />
+            <php outputFile="build/coverage/account.php" />
+            <text outputFile="php://stdout" showUncoveredFiles="true" />
+            <xml outputDirectory="build/coverage/account-xml" />
+        </report>
+    </coverage>
+    <php>
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
+        <env name="DB_CONNECTION" value="pgsql" force="true"/>
+        <env name="DB_DATABASE" value="ledger_testing" force="true"/>
+        <env name="DB_HOST" value="127.0.0.1" force="true"/>
+        <env name="DB_PASSWORD" value="postgres" force="true"/>
+        <env name="DB_PORT" value="5432" force="true"/>
+        <env name="DB_USERNAME" value="postgres" force="true"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
+        <env name="PULSE_ENABLED" value="false" force="true"/>
+        <env name="TELESCOPE_ENABLED" value="false" force="true"/>
+        <env name="NIGHTWATCH_ENABLED" value="false" force="true"/>
+    </php>
+</phpunit>
