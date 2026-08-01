@@ -77,15 +77,15 @@
             "@types:check",
             "@php artisan test"
         ],
-        "test:accounts": [
-            "@php artisan test --compact tests/Unit/Accounts tests/Feature/Accounts"
+        "test:finance": [
+            "@php artisan test --compact tests/Unit/Accounts tests/Feature/Accounts tests/Unit/Transactions tests/Feature/Transactions"
         ],
-        "test:accounts:postgres": [
-            "bash scripts/test-accounts-postgres.sh"
+        "test:finance:postgres": [
+            "bash scripts/test-finance-postgres.sh"
         ],
-        "coverage:accounts": [
-            "XDEBUG_MODE=coverage @php vendor/bin/phpunit --configuration=phpunit.account.xml --coverage-php=build/coverage/account.php",
-            "@php scripts/assert-account-coverage.php build/coverage/account.php"
+        "coverage:finance": [
+            "XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=phpunit.finance.xml --coverage-php=build/coverage/finance.php",
+            "@php scripts/assert-finance-coverage.php build/coverage/finance.php"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

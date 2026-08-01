@@ -22,15 +22,23 @@ trait HasSorting
     abstract protected function sortableColumns(): array;
 
     /**
+     * Get the default column used when no public sort is selected.
+     */
+    protected function defaultSortColumn(): string
+    {
+        return 'created_at';
+    }
+
+    /**
      * Order by an approved column, newest first by default.
      *
-     * @param Builder<static> $query
+     * @param  Builder<static>  $query
      */
     #[Scope]
     protected function sorted(Builder $query, ?string $value): void
     {
         if ($value === null || $value === '') {
-            $query->latest();
+            $query->orderByDesc($this->defaultSortColumn())->orderByDesc($this->getKeyName());
 
             return;
         }
@@ -39,7 +47,7 @@ trait HasSorting
         $column = $key === null ? null : $this->sortableColumns()[Str::lower($key)] ?? null;
 
         if ($column === null) {
-            $query->latest();
+            $query->orderByDesc($this->defaultSortColumn())->orderByDesc($this->getKeyName());
 
             return;
         }
@@ -49,6 +57,6 @@ trait HasSorting
             default => 'asc',
         };
 
-        $query->orderBy($column, $direction)->latest();
+        $query->orderBy($column, $direction)->orderByDesc($this->getKeyName());
     }
 }

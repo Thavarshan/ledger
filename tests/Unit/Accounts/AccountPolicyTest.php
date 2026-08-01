@@ -12,7 +12,8 @@ class AccountPolicyTest extends TestCase
     public function test_view_any_and_create_are_allowed(): void
     {
         $policy = new AccountPolicy;
-        $user = new User(['id' => 1]);
+        $user = new User;
+        $user->setAttribute('id', 1);
 
         $this->assertTrue($policy->viewAny($user));
         $this->assertTrue($policy->create($user));

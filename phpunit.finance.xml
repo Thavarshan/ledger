@@ -11,31 +11,61 @@
         <testsuite name="Account Feature">
             <directory>tests/Feature/Accounts</directory>
         </testsuite>
+        <testsuite name="Transaction Unit">
+            <directory>tests/Unit/Transactions</directory>
+        </testsuite>
+        <testsuite name="Transaction Feature">
+            <directory>tests/Feature/Transactions</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
-            <file>app/Concerns/AccountValidationRules.php</file>
             <file>app/Concerns/HasEnumValues.php</file>
             <file>app/Concerns/HasSearch.php</file>
             <file>app/Concerns/HasSorting.php</file>
             <file>app/Enums/CurrencyCode.php</file>
+            <file>app/Enums/AccountType.php</file>
+            <file>app/Enums/TransactionDirection.php</file>
+            <file>app/Actions/CreateAccount.php</file>
+            <file>app/Actions/UpdateAccount.php</file>
+            <file>app/Actions/DeleteAccount.php</file>
+            <file>app/Actions/CreateTransaction.php</file>
+            <file>app/Actions/UpdateTransaction.php</file>
+            <file>app/Actions/DeleteTransaction.php</file>
             <file>app/Filters/AccountFilter.php</file>
+            <file>app/Filters/TransactionFilter.php</file>
             <file>app/Http/Controllers/AccountController.php</file>
+            <file>app/Http/Controllers/TransactionController.php</file>
             <file>app/Http/Requests/IndexAccountRequest.php</file>
+            <file>app/Http/Requests/IndexTransactionRequest.php</file>
+            <file>app/Http/Requests/AccountRequest.php</file>
+            <file>app/Http/Requests/TransactionRequest.php</file>
             <file>app/Http/Requests/StoreAccountRequest.php</file>
+            <file>app/Http/Requests/StoreTransactionRequest.php</file>
             <file>app/Http/Requests/UpdateAccountRequest.php</file>
+            <file>app/Http/Requests/UpdateTransactionRequest.php</file>
             <file>app/Http/Resources/AccountResource.php</file>
+            <file>app/Http/Resources/AccountSummaryResource.php</file>
+            <file>app/Http/Resources/TransactionResource.php</file>
             <file>app/Models/Account.php</file>
+            <file>app/Models/Transaction.php</file>
             <file>app/Policies/AccountPolicy.php</file>
-            <file>app/Services/AccountService.php</file>
+            <file>app/Policies/TransactionPolicy.php</file>
+            <file>app/Services/AccountAttributePreparer.php</file>
+            <file>app/Services/PrimaryAccountManager.php</file>
+            <file>app/Services/ActiveOwnedAccount.php</file>
+            <file>app/Services/AccountFormOptions.php</file>
+            <file>app/Services/TransactionFormOptions.php</file>
+            <file>app/Services/AccountIndexQuery.php</file>
+            <file>app/Services/TransactionIndexQuery.php</file>
         </include>
     </source>
     <coverage pathCoverage="true" includeUncoveredFiles="true">
         <report>
-            <html outputDirectory="build/coverage/account" />
-            <php outputFile="build/coverage/account.php" />
+            <html outputDirectory="build/coverage/finance" />
+            <php outputFile="build/coverage/finance.php" />
             <text outputFile="php://stdout" showUncoveredFiles="true" />
-            <xml outputDirectory="build/coverage/account-xml" />
+            <xml outputDirectory="build/coverage/finance-xml" />
         </report>
     </coverage>
     <php>

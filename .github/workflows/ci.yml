@@ -69,6 +69,7 @@ jobs:
           npm run format:check
           npm run lint:check
           npm run types:check
+          npm run test:frontend
           npm run build
 
   test:
@@ -102,8 +103,8 @@ jobs:
       - name: Run PHPUnit suite
         run: php artisan test --compact
 
-  account-coverage:
-    name: Account coverage (PostgreSQL)
+  finance-coverage:
+    name: Finance coverage (PostgreSQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -144,14 +145,14 @@ jobs:
           php artisan key:generate --force
           php artisan config:clear
 
-      - name: Run Account coverage gate
-        run: composer coverage:accounts
+      - name: Run finance coverage gate
+        run: composer coverage:finance
 
-      - name: Upload Account coverage report
+      - name: Upload finance coverage report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: account-coverage
+          name: finance-coverage
           path: build/coverage/
           if-no-files-found: error
           retention-days: 14

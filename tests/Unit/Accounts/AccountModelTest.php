@@ -27,8 +27,10 @@ class AccountModelTest extends TestCase
     public function test_it_belongs_to_a_user_and_exposes_search_configuration(): void
     {
         $account = Account::factory()->make();
+        $user = $account->user;
 
         $this->assertSame('user_id', $account->user()->getForeignKeyName());
+        $this->assertSame('user_id', $user->accounts()->getForeignKeyName());
         $this->assertSame(['name', 'bank_name', 'account_holder_name'], $this->invoke($account, 'searchableColumns'));
         $this->assertSame([
             'name' => 'name',

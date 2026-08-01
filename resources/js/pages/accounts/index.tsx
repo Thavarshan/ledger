@@ -1,20 +1,25 @@
-import { Head, Link } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import {
     create,
     edit,
     index,
     show,
 } from '@/actions/App/Http/Controllers/AccountController';
-import type { Account } from '@/components/account-form';
+import Pagination from '@/components/pagination';
 import { Button } from '@/components/ui/button';
+import type { AccountSummary, Paginated } from '@/types';
 
 type Props = {
-    accounts: { data: Account[] };
+    accounts: Paginated<AccountSummary>;
     accountTypes: string[];
     currencies: string[];
 };
 
-export default function AccountsIndex({ accounts }: Props) {
+export default function AccountsIndex({
+    accounts,
+    accountTypes,
+    currencies,
+}: Props) {
     return (
         <>
             <Head title="Accounts" />
@@ -30,6 +35,52 @@ export default function AccountsIndex({ accounts }: Props) {
                         <Link href={create()}>Add account</Link>
                     </Button>
                 </div>
+                <Form
+                    action={index()}
+                    className="flex flex-wrap gap-3 rounded-xl border p-3"
+                >
+                    <input
+                        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        name="search"
+                        placeholder="Search accounts"
+                    />
+                    <select
+                        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        name="account_type"
+                        defaultValue=""
+                    >
+                        <option value="">All types</option>
+                        {accountTypes.map((type) => (
+                            <option key={type} value={type}>
+                                {type.replace('_', ' ')}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        name="currency_code"
+                        defaultValue=""
+                    >
+                        <option value="">All currencies</option>
+                        {currencies.map((currency) => (
+                            <option key={currency} value={currency}>
+                                {currency}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                        name="sort"
+                        defaultValue=""
+                    >
+                        <option value="">Newest</option>
+                        <option value="name:asc">Name</option>
+                        <option value="bank_name:asc">Bank</option>
+                    </select>
+                    <Button type="submit" variant="outline">
+                        Apply
+                    </Button>
+                </Form>
                 <div className="overflow-hidden rounded-xl border">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-left">
@@ -80,6 +131,7 @@ export default function AccountsIndex({ accounts }: Props) {
                             No accounts yet.
                         </p>
                     )}
+                    <Pagination items={accounts} />
                 </div>
             </div>
         </>

@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Accounts;
 
+use App\Actions\CreateAccount;
+use App\Actions\UpdateAccount;
 use App\Models\Account;
 use App\Models\User;
-use App\Services\AccountService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class AccountServiceTest extends TestCase
     public function test_create_derives_last_four_and_ignores_client_metadata(): void
     {
         $user = User::factory()->create();
-        $account = app(AccountService::class)->create($user, Account::factory()->raw([
+        $account = app(CreateAccount::class)->handle($user, Account::factory()->raw([
             'account_number' => '001234567890',
             'account_number_last4' => '9999',
         ]));
@@ -31,7 +32,7 @@ class AccountServiceTest extends TestCase
         $existing = Account::factory()->for($user)->create(['is_primary' => true]);
         $account = Account::factory()->for($user)->create();
 
-        app(AccountService::class)->update($account, ['is_primary' => true]);
+        app(UpdateAccount::class)->handle($user, $account, ['is_primary' => true]);
 
         $this->assertFalse((bool) $existing->refresh()->is_primary);
         $this->assertTrue((bool) $account->refresh()->is_primary);
@@ -41,7 +42,7 @@ class AccountServiceTest extends TestCase
     {
         $account = Account::factory()->create(['account_number' => '001234567890']);
 
-        app(AccountService::class)->update($account, ['is_active' => false]);
+        app(UpdateAccount::class)->handle($account->user, $account, ['is_active' => false]);
 
         $this->assertSame('001234567890', $account->refresh()->account_number);
         $this->assertFalse((bool) $account->is_active);
@@ -54,7 +55,7 @@ class AccountServiceTest extends TestCase
 
         $this->expectException(QueryException::class);
         try {
-            app(AccountService::class)->create($user, Account::factory()->raw([
+            app(CreateAccount::class)->handle($user, Account::factory()->raw([
                 'bank_name' => null,
                 'is_primary' => true,
             ]));

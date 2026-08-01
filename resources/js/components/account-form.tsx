@@ -15,27 +15,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import type { Account } from '@/types';
 
-export type Account = {
-    id: number;
-    name: string;
-    account_type: string;
-    account_holder_name: string | null;
-    bank_name: string;
-    bank_code: string | null;
-    branch_name: string | null;
-    branch_code: string | null;
-    country_code: string;
-    currency_code: string;
-    account_number_last4: string | null;
-    iban: string | null;
-    swift_bic: string | null;
-    routing_number: string | null;
-    sort_code: string | null;
-    notes: string | null;
-    is_primary: boolean;
-    is_active: boolean;
-};
+export type { Account } from '@/types';
 
 type AccountFormProps = {
     account?: Account;
@@ -132,6 +114,30 @@ export default function AccountForm({
                             form.setData('bank_name', event.target.value)
                         }
                         required
+                    />
+                </Field>
+                <Field label="Bank code" error={form.errors.bank_code}>
+                    <Input
+                        value={form.data.bank_code}
+                        onChange={(event) =>
+                            form.setData('bank_code', event.target.value)
+                        }
+                    />
+                </Field>
+                <Field label="Branch name" error={form.errors.branch_name}>
+                    <Input
+                        value={form.data.branch_name}
+                        onChange={(event) =>
+                            form.setData('branch_name', event.target.value)
+                        }
+                    />
+                </Field>
+                <Field label="Branch code" error={form.errors.branch_code}>
+                    <Input
+                        value={form.data.branch_code}
+                        onChange={(event) =>
+                            form.setData('branch_code', event.target.value)
+                        }
                     />
                 </Field>
                 <Field
@@ -235,6 +241,15 @@ export default function AccountForm({
                     />
                 </Field>
             </div>
+            <Field label="Notes" error={form.errors.notes}>
+                <textarea
+                    className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                    value={form.data.notes}
+                    onChange={(event) =>
+                        form.setData('notes', event.target.value)
+                    }
+                />
+            </Field>
             <div className="flex flex-wrap gap-6">
                 <label className="flex items-center gap-2 text-sm">
                     <Checkbox

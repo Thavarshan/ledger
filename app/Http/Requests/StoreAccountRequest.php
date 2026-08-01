@@ -2,25 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Concerns\AccountValidationRules;
 use App\Models\Account;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Authorizes and validates requests that create a bank account.
  */
-class StoreAccountRequest extends FormRequest
+class StoreAccountRequest extends AccountRequest
 {
-    use AccountValidationRules;
-
     public function authorize(): bool
     {
         return $this->user()?->can('create', Account::class) ?? false;
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->normalizeAccountInput();
     }
 
     /**
@@ -30,6 +21,6 @@ class StoreAccountRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->accountRules();
+        return $this->accountRules(partial: false);
     }
 }

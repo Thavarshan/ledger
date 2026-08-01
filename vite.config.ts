@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     plugins: [
@@ -28,4 +28,9 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+    test: {
+        environment: 'jsdom',
+        globals: true,
+        setupFiles: ['resources/js/test/setup.ts'],
+    },
 });

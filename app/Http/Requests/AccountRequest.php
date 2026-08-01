@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Http\Requests;
 
+use App\Enums\AccountType;
 use App\Enums\CurrencyCode;
-use App\Models\Account;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
- * Shares normalized input and validation rules between account form requests.
+ * Provides normalized, shared validation for account mutations.
  */
-trait AccountValidationRules
+abstract class AccountRequest extends FormRequest
 {
-    protected function normalizeAccountInput(): void
+    protected function prepareForValidation(): void
     {
         $normalized = [];
 
@@ -28,20 +29,20 @@ trait AccountValidationRules
     /**
      * @return array<string, array<int, mixed>>
      */
-    protected function accountRules(bool $partial = false): array
+    protected function accountRules(bool $partial): array
     {
         $required = $partial ? ['sometimes', 'required'] : ['required'];
 
         return [
             'name' => [...$required, 'string', 'max:255'],
-            'account_type' => [...$required, 'string', Rule::in(Account::TYPES)],
+            'account_type' => [...$required, 'string', Rule::enum(AccountType::class)],
             'account_holder_name' => ['nullable', 'string', 'max:255'],
             'bank_name' => [...$required, 'string', 'max:150'],
             'bank_code' => ['nullable', 'string', 'max:20'],
             'branch_name' => ['nullable', 'string', 'max:150'],
             'branch_code' => ['nullable', 'string', 'max:20'],
-            'country_code' => [...$required, 'string', 'size:2', 'alpha'],
-            'currency_code' => [...$required, 'string', Rule::in(CurrencyCode::values())],
+            'country_code' => [...$required, 'string', 'size:2', 'alpha:ascii'],
+            'currency_code' => [...$required, 'string', Rule::enum(CurrencyCode::class)],
             'account_number' => [...$required, 'string', 'max:255'],
             'iban' => ['nullable', 'string', 'max:255'],
             'swift_bic' => ['nullable', 'string', 'max:11', 'regex:/^[A-Z0-9]{8}([A-Z0-9]{3})?$/'],

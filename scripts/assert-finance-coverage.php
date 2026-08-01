@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 
-$coveragePath = $argv[1] ?? 'build/coverage/account.php';
+$coveragePath = $argv[1] ?? 'build/coverage/finance.php';
 
 if (! is_file($coveragePath)) {
     fwrite(STDERR, "Coverage file not found: {$coveragePath}\n");
@@ -28,7 +28,7 @@ $executedBranches = $report->numberOfExecutedBranches();
 
 if ($executableLines !== $executedLines || $executableBranches !== $executedBranches) {
     fwrite(STDERR, sprintf(
-        "Account coverage gate failed: lines %d/%d, branches %d/%d.\n",
+        "Finance coverage gate failed: lines %d/%d, branches %d/%d.\n",
         $executedLines,
         $executableLines,
         $executedBranches,
@@ -39,7 +39,7 @@ if ($executableLines !== $executedLines || $executableBranches !== $executedBran
 }
 
 printf(
-    "Account coverage gate passed: lines %d/%d, branches %d/%d.\n",
+    "Finance coverage gate passed: lines %d/%d, branches %d/%d.\n",
     $executedLines,
     $executableLines,
     $executedBranches,

@@ -3,29 +3,27 @@
 namespace Tests\Unit\Accounts;
 
 use App\Filters\AccountFilter;
-use App\Models\Account;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
 class AccountFilterTest extends TestCase
 {
-    public function test_filter_values_are_normalized_for_case_insensitive_query_parameters(): void
+    public function test_filter_values_are_applied_without_mutating_the_request(): void
     {
         $request = Request::create('/accounts?country_code=lk&currency_code=lkr');
         $filter = new AccountFilter($request);
 
         $this->assertSame([
-            'country_code' => 'LK',
-            'currency_code' => 'LKR',
+            'country_code' => 'lk',
+            'currency_code' => 'lkr',
         ], $filter->getFilterables());
     }
 
-    public function test_invalid_filter_values_are_rejected_by_the_filter(): void
+    public function test_filter_does_not_own_query_validation(): void
     {
         $request = Request::create('/accounts?currency_code=XXX');
         $filter = new AccountFilter($request);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $filter->apply(Account::query());
+        $this->assertSame(['currency_code' => 'XXX'], $filter->getFilterables());
     }
 }

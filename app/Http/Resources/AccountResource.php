@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,7 +11,7 @@ use function Illuminate\Support\enum_value;
 /**
  * Serializes an account for Inertia responses without exposing secret identifiers.
  *
- * @mixin \App\Models\Account
+ * @mixin Account
  */
 class AccountResource extends JsonResource
 {
@@ -26,7 +27,7 @@ class AccountResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'account_type' => $this->account_type,
+            'account_type' => (string) enum_value($this->account_type),
             'account_holder_name' => $this->account_holder_name,
             'bank_name' => $this->bank_name,
             'bank_code' => $this->bank_code,

@@ -2,25 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Concerns\AccountValidationRules;
 use App\Models\Account;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Authorizes and validates requests that update a bank account.
  */
-class UpdateAccountRequest extends FormRequest
+class UpdateAccountRequest extends AccountRequest
 {
-    use AccountValidationRules;
-
     public function authorize(): bool
     {
         return $this->user()?->can('update', $this->route('account')) ?? false;
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->normalizeAccountInput();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\HasSearch;
 use App\Concerns\HasSorting;
+use App\Enums\AccountType;
 use App\Enums\CurrencyCode;
 use App\Http\Resources\AccountResource;
 use App\Policies\AccountPolicy;
@@ -11,12 +12,15 @@ use Database\Factories\AccountFactory;
 use Filterable\Traits\Filterable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Attributes\UseResource;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * A bank account owned by a user.
@@ -24,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property string $name
- * @property string $account_type
+ * @property AccountType $account_type
  * @property string|null $account_holder_name
  * @property string $bank_name
  * @property string|null $bank_code
@@ -69,17 +73,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[UseResource(AccountResource::class)]
 class Account extends Model
 {
+    /** @var list<string> */
     public const array TYPES = [
         'savings',
         'current',
         'fixed_deposit',
     ];
 
+    use Filterable;
+
     /** @use HasFactory<AccountFactory> */
     use HasFactory;
+
     use HasSearch;
     use HasSorting;
-    use Filterable;
 
     /**
      * Get the user that owns the account.
@@ -89,6 +96,27 @@ class Account extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the transactions recorded against the account.
+     *
+     * @return HasMany<Transaction, $this>
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Scope the query to active accounts.
+     *
+     * @param  Builder<static>  $query
+     */
+    #[Scope]
+    protected function active(Builder $query): void
+    {
+        $query->where('is_active', true);
     }
 
     /**
@@ -129,6 +157,7 @@ class Account extends Model
     protected function casts(): array
     {
         return [
+            'account_type' => AccountType::class,
             'currency_code' => CurrencyCode::class,
             'account_number' => 'encrypted',
             'iban' => 'encrypted',
