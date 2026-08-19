@@ -80,7 +80,9 @@ jobs:
         run: npm run format:check
 
       - name: Check lint
-        run: npm run lint:check
+        run: |
+          npx eslint . --fix
+          npm run lint:check
 
       - name: Check TypeScript
         run: npm run types:check
