@@ -34,7 +34,7 @@ class AccountPostgresTest extends TestCase
         $this->assertArrayHasKey('accounts_name_trgm_index', $definitions->all());
         $this->assertArrayHasKey('accounts_bank_name_trgm_index', $definitions->all());
         $this->assertArrayHasKey('accounts_holder_name_trgm_index', $definitions->all());
-        $this->assertStringContainsString('WHERE is_primary', strtoupper($definitions['accounts_user_primary_unique']));
+        $this->assertStringContainsString('WHERE IS_PRIMARY', strtoupper($definitions['accounts_user_primary_unique']));
     }
 
     public function test_postgresql_enforces_one_primary_account_per_user(): void
