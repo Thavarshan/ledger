@@ -66,6 +66,22 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup PHP for Wayfinder generation
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:v2
+          coverage: none
+
+      - name: Install PHP dependencies for Wayfinder
+        run: composer install --prefer-dist --optimize-autoloader
+
+      - name: Generate Wayfinder types
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
+          php artisan wayfinder:generate --with-form --no-interaction
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
