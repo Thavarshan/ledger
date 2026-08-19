@@ -1,0 +1,7 @@
+# Default ownership for review routing.
+* @Thavarshan
+
+# Changes to automation and security policy require repository-owner review.
+/.github/ @Thavarshan
+/SECURITY.md @Thavarshan
+/CODE_OF_CONDUCT.md @Thavarshan
