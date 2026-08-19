@@ -10,9 +10,8 @@ on:
     - cron: '17 3 * * 1'
 
 # Configure this workflow as a required check named `CI / gate` on main.
-# Laravel Cloud should be connected to this repository with push-to-deploy
-# enabled only for main; GitHub branch protection then becomes the deployment
-# gate before Cloud receives a merge.
+# The deploy job calls Laravel Cloud only after this gate succeeds, ensuring
+# production receives the exact commit validated by CI.
 permissions:
   contents: read
 
@@ -158,7 +157,9 @@ jobs:
         run: composer install --prefer-dist --optimize-autoloader
 
       - name: Run PostgreSQL finance tests
-        run: composer test:finance:postgres
+        env:
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+        run: php vendor/bin/phpunit --configuration=phpunit.finance.xml --no-coverage
 
   security:
     name: Dependency security audit
@@ -223,3 +224,15 @@ jobs:
           test "${BACKEND_TESTS}" = success
           test "${POSTGRES_FINANCE}" = success
           test "${SECURITY}" = success
+
+  deploy:
+    name: Deploy production
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger Laravel Cloud deployment
+        run: >-
+          curl --fail --show-error --request POST
+          "${{ secrets.LARAVEL_CLOUD_DEPLOY_HOOK }}?commit_hash=${{ github.sha }}"
