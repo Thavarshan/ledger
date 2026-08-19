@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateTransaction;
-use App\Actions\DeleteTransaction;
 use App\Actions\UpdateTransaction;
-use App\Filters\TransactionFilter;
 use App\Http\Requests\IndexTransactionRequest;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
@@ -30,9 +28,7 @@ class TransactionController extends Controller
         return Inertia::render('transactions/index', [
             'transactions' => TransactionResource::collection($transactions->paginate(
                 $request->user(),
-                new TransactionFilter($request),
-                $request->string('search')->toString(),
-                $request->string('sort')->toString(),
+                $request->validated(),
             )),
             ...$options->for($request->user()),
         ]);
@@ -74,7 +70,7 @@ class TransactionController extends Controller
     #[Authorize('update', 'transaction')]
     public function update(UpdateTransactionRequest $request, Transaction $transaction, UpdateTransaction $update): RedirectResponse
     {
-        $transaction = $update->handle($request->user(), $transaction, $request->validated());
+        $transaction = $update->handle($transaction, $request->validated());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Transaction updated.')]);
 
@@ -82,9 +78,9 @@ class TransactionController extends Controller
     }
 
     #[Authorize('delete', 'transaction')]
-    public function destroy(Transaction $transaction, DeleteTransaction $delete): RedirectResponse
+    public function destroy(Transaction $transaction): RedirectResponse
     {
-        $delete->handle($transaction);
+        $transaction->delete();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Transaction deleted.')]);
 

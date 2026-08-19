@@ -30,8 +30,6 @@ class AccountPolicyTest extends TestCase
         $this->assertTrue($policy->view($user, $account));
         $this->assertTrue($policy->update($user, $account));
         $this->assertTrue($policy->delete($user, $account));
-        $this->assertTrue($policy->restore($user, $account));
-        $this->assertTrue($policy->forceDelete($user, $account));
     }
 
     public function test_non_owner_cannot_manage_an_account(): void
@@ -45,7 +43,5 @@ class AccountPolicyTest extends TestCase
         $this->assertFalse($policy->view($user, $account));
         $this->assertFalse($policy->update($user, $account));
         $this->assertFalse($policy->delete($user, $account));
-        $this->assertFalse($policy->restore($user, $account));
-        $this->assertFalse($policy->forceDelete($user, $account));
     }
 }

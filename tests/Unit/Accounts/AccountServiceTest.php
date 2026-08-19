@@ -32,7 +32,7 @@ class AccountServiceTest extends TestCase
         $existing = Account::factory()->for($user)->create(['is_primary' => true]);
         $account = Account::factory()->for($user)->create();
 
-        app(UpdateAccount::class)->handle($user, $account, ['is_primary' => true]);
+        app(UpdateAccount::class)->handle($account, ['is_primary' => true]);
 
         $this->assertFalse((bool) $existing->refresh()->is_primary);
         $this->assertTrue((bool) $account->refresh()->is_primary);
@@ -42,7 +42,7 @@ class AccountServiceTest extends TestCase
     {
         $account = Account::factory()->create(['account_number' => '001234567890']);
 
-        app(UpdateAccount::class)->handle($account->user, $account, ['is_active' => false]);
+        app(UpdateAccount::class)->handle($account, ['is_active' => false]);
 
         $this->assertSame('001234567890', $account->refresh()->account_number);
         $this->assertFalse((bool) $account->is_active);

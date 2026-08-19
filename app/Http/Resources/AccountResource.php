@@ -43,6 +43,10 @@ class AccountResource extends JsonResource
             'notes' => $this->notes,
             'is_primary' => $this->is_primary,
             'is_active' => $this->is_active,
+            'balance_minor' => $this->when(
+                $this->balance_minor !== null,
+                fn (): string => (string) $this->balance_minor,
+            ),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

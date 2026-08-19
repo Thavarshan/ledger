@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\TransactionDirection;
-use App\Http\Resources\AccountSummaryResource;
+use App\Http\Resources\AccountOptionResource;
 use App\Models\Transaction;
 use App\Models\User;
 
@@ -18,7 +18,7 @@ final class TransactionFormOptions
     public function for(User $owner, ?Transaction $transaction = null): array
     {
         $accounts = $owner->accounts()
-            ->select(['id', 'name', 'currency_code', 'is_active'])
+            ->select(['id', 'name', 'currency_code'])
             ->where(function ($query) use ($transaction): void {
                 $query->active()
                     ->when($transaction, fn ($query) => $query->orWhere('id', $transaction->account_id));
@@ -27,7 +27,7 @@ final class TransactionFormOptions
             ->get();
 
         return [
-            'accounts' => AccountSummaryResource::collection($accounts)->resolve(),
+            'accounts' => AccountOptionResource::collection($accounts)->resolve(),
             'directions' => TransactionDirection::values(),
         ];
     }

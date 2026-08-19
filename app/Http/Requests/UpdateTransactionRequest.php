@@ -10,14 +10,6 @@ use App\Models\Transaction;
 class UpdateTransactionRequest extends TransactionRequest
 {
     /**
-     * Determine whether the user may update the transaction.
-     */
-    public function authorize(): bool
-    {
-        return $this->user()?->can('update', $this->route('transaction')) ?? false;
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, array<int, mixed>>

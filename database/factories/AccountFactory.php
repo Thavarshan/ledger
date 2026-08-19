@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AccountType;
 use App\Enums\CurrencyCode;
 use App\Models\Account;
 use App\Models\User;
@@ -26,7 +27,7 @@ class AccountFactory extends Factory
         return [
             'user_id' => User::factory(),
             'name' => fake()->name().' Account',
-            'account_type' => fake()->randomElement(Account::TYPES),
+            'account_type' => fake()->randomElement(AccountType::cases()),
             'account_holder_name' => fake()->name(),
             'bank_name' => fake()->randomElement([
                 'Bank of Ceylon',

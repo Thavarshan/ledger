@@ -17,18 +17,46 @@ export type Account = {
     notes: string | null;
     is_primary: boolean;
     is_active: boolean;
+    balance_minor?: string;
     created_at: string | null;
     updated_at: string | null;
 };
 
-export type AccountSummary = {
+export type AccountFormData = {
+    name: string;
+    account_type: string;
+    account_holder_name: string;
+    bank_name: string;
+    bank_code: string;
+    branch_name: string;
+    branch_code: string;
+    country_code: string;
+    currency_code: string;
+    account_number: string;
+    iban: string;
+    swift_bic: string;
+    routing_number: string;
+    sort_code: string;
+    notes: string;
+    is_primary: boolean;
+    is_active: boolean;
+};
+
+export type AccountListItem = {
     id: number;
     name: string;
-    bank_name?: string;
+    bank_name: string;
     currency_code: string;
-    account_number_last4?: string | null;
-    is_primary?: boolean;
-    is_active?: boolean;
+    account_number_last4: string | null;
+    is_primary: boolean;
+    is_active: boolean;
+    balance_minor: string;
+};
+
+export type AccountOption = {
+    id: number;
+    name: string;
+    currency_code: string;
 };
 
 export type Transaction = {
@@ -40,9 +68,22 @@ export type Transaction = {
     reference: string | null;
     notes: string | null;
     occurred_at: string;
-    account?: AccountSummary;
     created_at: string | null;
     updated_at: string | null;
+};
+
+export type TransactionWithAccount = Transaction & {
+    account: AccountOption;
+};
+
+export type TransactionFormData = {
+    account_id: string;
+    direction: Transaction['direction'];
+    amount: string;
+    description: string;
+    reference: string;
+    notes: string;
+    occurred_at: string;
 };
 
 export type ResourceResponse<T> = {

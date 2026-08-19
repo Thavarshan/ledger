@@ -23,11 +23,12 @@ class AccountSummaryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'bank_name' => $this->whenHas('bank_name'),
+            'bank_name' => $this->bank_name,
             'currency_code' => (string) enum_value($this->currency_code),
-            'account_number_last4' => $this->whenHas('account_number_last4'),
-            'is_primary' => $this->whenHas('is_primary'),
-            'is_active' => $this->whenHas('is_active'),
+            'account_number_last4' => $this->account_number_last4,
+            'is_primary' => $this->is_primary,
+            'is_active' => $this->is_active,
+            'balance_minor' => (string) $this->balance_minor,
         ];
     }
 }

@@ -4,13 +4,14 @@ import {
     index,
 } from '@/actions/App/Http/Controllers/TransactionController';
 import TransactionForm from '@/components/transaction-form';
-import type { AccountSummary, Transaction } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import type { AccountOption, Transaction } from '@/types';
 
 export default function CreateTransaction({
     accounts,
     directions,
 }: {
-    accounts: AccountSummary[];
+    accounts: AccountOption[];
     directions: Transaction['direction'][];
 }) {
     return (
@@ -23,7 +24,14 @@ export default function CreateTransaction({
                         Record a credit or debit against an account.
                     </p>
                 </div>
-                <TransactionForm accounts={accounts} directions={directions} />
+                <Card className="max-w-2xl">
+                    <CardContent>
+                        <TransactionForm
+                            accounts={accounts}
+                            directions={directions}
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </>
     );

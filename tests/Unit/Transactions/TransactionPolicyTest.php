@@ -28,7 +28,7 @@ class TransactionPolicyTest extends TestCase
         $transaction = Transaction::factory()->forAccount($account)->create();
         $policy = new TransactionPolicy;
 
-        foreach (['view', 'update', 'delete', 'restore', 'forceDelete'] as $ability) {
+        foreach (['view', 'update', 'delete'] as $ability) {
             $this->assertTrue($policy->{$ability}($account->user, $transaction));
         }
     }
@@ -40,7 +40,7 @@ class TransactionPolicyTest extends TestCase
         $otherUser = User::factory()->create();
         $policy = new TransactionPolicy;
 
-        foreach (['view', 'update', 'delete', 'restore', 'forceDelete'] as $ability) {
+        foreach (['view', 'update', 'delete'] as $ability) {
             $this->assertFalse($policy->{$ability}($otherUser, $transaction));
         }
     }

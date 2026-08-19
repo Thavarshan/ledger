@@ -52,7 +52,7 @@ class TransactionServiceTest extends TestCase
         $target = Account::factory()->for($user)->create();
         $transaction = Transaction::factory()->forAccount($source)->create();
 
-        $updated = app(UpdateTransaction::class)->handle($user, $transaction, [
+        $updated = app(UpdateTransaction::class)->handle($transaction, [
             'account_id' => $target->id,
             'description' => 'Moved transaction',
         ]);
@@ -66,7 +66,7 @@ class TransactionServiceTest extends TestCase
         $account = Account::factory()->inactive()->create();
         $transaction = Transaction::factory()->forAccount($account)->create();
 
-        $updated = app(UpdateTransaction::class)->handle($account->user, $transaction, [
+        $updated = app(UpdateTransaction::class)->handle($transaction, [
             'account_id' => $account->id,
             'description' => 'Corrected historical transaction',
         ]);
@@ -75,14 +75,15 @@ class TransactionServiceTest extends TestCase
         $this->assertSame('Corrected historical transaction', $updated->description);
     }
 
-    public function test_update_rejects_a_transaction_owned_by_another_user(): void
+    public function test_update_rejects_reassignment_to_another_users_account(): void
     {
         $account = Account::factory()->create();
+        $otherAccount = Account::factory()->create();
         $transaction = Transaction::factory()->forAccount($account)->create();
 
         $this->expectException(ModelNotFoundException::class);
-        app(UpdateTransaction::class)->handle(User::factory()->create(), $transaction, [
-            'description' => 'Blocked',
+        app(UpdateTransaction::class)->handle($transaction, [
+            'account_id' => $otherAccount->id,
         ]);
     }
 }

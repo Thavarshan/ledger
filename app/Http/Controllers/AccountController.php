@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateAccount;
-use App\Actions\DeleteAccount;
 use App\Actions\UpdateAccount;
-use App\Filters\AccountFilter;
+use App\Enums\AccountType;
+use App\Enums\CurrencyCode;
 use App\Http\Requests\IndexAccountRequest;
 use App\Http\Requests\StoreAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSummaryResource;
 use App\Models\Account;
-use App\Services\AccountFormOptions;
 use App\Services\AccountIndexQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
@@ -25,23 +24,21 @@ use Inertia\Response;
 class AccountController extends Controller
 {
     #[Authorize('viewAny', Account::class)]
-    public function index(IndexAccountRequest $request, AccountIndexQuery $accounts, AccountFormOptions $options): Response
+    public function index(IndexAccountRequest $request, AccountIndexQuery $accounts): Response
     {
         return Inertia::render('accounts/index', [
             'accounts' => AccountSummaryResource::collection($accounts->paginate(
                 $request->user(),
-                new AccountFilter($request),
-                $request->string('search')->toString(),
-                $request->string('sort')->toString(),
+                $request->validated(),
             )),
-            ...$options->all(),
+            ...$this->formOptions(),
         ]);
     }
 
     #[Authorize('create', Account::class)]
-    public function create(AccountFormOptions $options): Response
+    public function create(): Response
     {
-        return Inertia::render('accounts/create', $options->all());
+        return Inertia::render('accounts/create', $this->formOptions());
     }
 
     #[Authorize('create', Account::class)]
@@ -57,22 +54,22 @@ class AccountController extends Controller
     #[Authorize('view', 'account')]
     public function show(Account $account): Response
     {
-        return Inertia::render('accounts/show', ['account' => AccountResource::make($account)]);
+        return Inertia::render('accounts/show', ['account' => AccountResource::make($account->loadBalance())]);
     }
 
     #[Authorize('update', 'account')]
-    public function edit(Account $account, AccountFormOptions $options): Response
+    public function edit(Account $account): Response
     {
         return Inertia::render('accounts/edit', [
-            ...$options->all(),
-            'account' => AccountResource::make($account),
+            ...$this->formOptions(),
+            'account' => AccountResource::make($account->loadBalance()),
         ]);
     }
 
     #[Authorize('update', 'account')]
     public function update(UpdateAccountRequest $request, Account $account, UpdateAccount $update): RedirectResponse
     {
-        $account = $update->handle($request->user(), $account, $request->validated());
+        $account = $update->handle($account, $request->validated());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Account updated.')]);
 
@@ -80,12 +77,23 @@ class AccountController extends Controller
     }
 
     #[Authorize('delete', 'account')]
-    public function destroy(Account $account, DeleteAccount $delete): RedirectResponse
+    public function destroy(Account $account): RedirectResponse
     {
-        $delete->handle($account);
+        $account->delete();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Account deleted.')]);
 
         return to_route('accounts.index');
+    }
+
+    /**
+     * @return array{accountTypes: list<string|int>, currencies: list<string|int>}
+     */
+    private function formOptions(): array
+    {
+        return [
+            'accountTypes' => AccountType::values(),
+            'currencies' => CurrencyCode::values(),
+        ];
     }
 }

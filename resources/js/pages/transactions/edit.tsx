@@ -1,15 +1,21 @@
 import { Head } from '@inertiajs/react';
 import { index } from '@/actions/App/Http/Controllers/TransactionController';
 import TransactionForm from '@/components/transaction-form';
-import type { AccountSummary, ResourceResponse, Transaction } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import type {
+    AccountOption,
+    ResourceResponse,
+    Transaction,
+    TransactionWithAccount,
+} from '@/types';
 
 export default function EditTransaction({
     transaction,
     accounts,
     directions,
 }: {
-    transaction: ResourceResponse<Transaction>;
-    accounts: AccountSummary[];
+    transaction: ResourceResponse<TransactionWithAccount>;
+    accounts: AccountOption[];
     directions: Transaction['direction'][];
 }) {
     return (
@@ -22,11 +28,15 @@ export default function EditTransaction({
                         Update this ledger entry.
                     </p>
                 </div>
-                <TransactionForm
-                    accounts={accounts}
-                    directions={directions}
-                    transaction={transaction.data}
-                />
+                <Card className="max-w-2xl">
+                    <CardContent>
+                        <TransactionForm
+                            accounts={accounts}
+                            directions={directions}
+                            transaction={transaction.data}
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </>
     );

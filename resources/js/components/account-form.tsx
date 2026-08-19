@@ -3,21 +3,15 @@ import {
     store,
     update,
 } from '@/actions/App/Http/Controllers/AccountController';
-import InputError from '@/components/input-error';
+import { AccountBankFields } from '@/components/account-bank-fields';
+import { AccountIdentityFields } from '@/components/account-identity-fields';
+import { AccountSensitiveFields } from '@/components/account-sensitive-fields';
+import { AccountStatusFields } from '@/components/account-status-fields';
+import { FormField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { FieldLegend, FieldSet } from '@/components/ui/field';
+import { Textarea } from '@/components/ui/textarea';
 import type { Account } from '@/types';
-
-export type { Account } from '@/types';
 
 type AccountFormProps = {
     account?: Account;
@@ -77,220 +71,46 @@ export default function AccountForm({
     }
 
     return (
-        <form onSubmit={submit} className="grid gap-6">
-            <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Account name" error={form.errors.name}>
-                    <Input
-                        value={form.data.name}
-                        onChange={(event) =>
-                            form.setData('name', event.target.value)
-                        }
-                        required
-                    />
-                </Field>
-                <Field label="Account type" error={form.errors.account_type}>
-                    <Select
-                        value={form.data.account_type}
-                        onValueChange={(value) =>
-                            form.setData('account_type', value)
-                        }
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {accountTypes.map((type) => (
-                                <SelectItem key={type} value={type}>
-                                    {type.replace('_', ' ')}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </Field>
-                <Field label="Bank name" error={form.errors.bank_name}>
-                    <Input
-                        value={form.data.bank_name}
-                        onChange={(event) =>
-                            form.setData('bank_name', event.target.value)
-                        }
-                        required
-                    />
-                </Field>
-                <Field label="Bank code" error={form.errors.bank_code}>
-                    <Input
-                        value={form.data.bank_code}
-                        onChange={(event) =>
-                            form.setData('bank_code', event.target.value)
-                        }
-                    />
-                </Field>
-                <Field label="Branch name" error={form.errors.branch_name}>
-                    <Input
-                        value={form.data.branch_name}
-                        onChange={(event) =>
-                            form.setData('branch_name', event.target.value)
-                        }
-                    />
-                </Field>
-                <Field label="Branch code" error={form.errors.branch_code}>
-                    <Input
-                        value={form.data.branch_code}
-                        onChange={(event) =>
-                            form.setData('branch_code', event.target.value)
-                        }
-                    />
-                </Field>
-                <Field
-                    label="Account holder"
-                    error={form.errors.account_holder_name}
-                >
-                    <Input
-                        value={form.data.account_holder_name}
-                        onChange={(event) =>
-                            form.setData(
-                                'account_holder_name',
-                                event.target.value,
-                            )
-                        }
-                    />
-                </Field>
-                <Field label="Country code" error={form.errors.country_code}>
-                    <Input
-                        value={form.data.country_code}
-                        onChange={(event) =>
-                            form.setData(
-                                'country_code',
-                                event.target.value.toUpperCase(),
-                            )
-                        }
-                        maxLength={2}
-                        required
-                    />
-                </Field>
-                <Field label="Currency" error={form.errors.currency_code}>
-                    <Select
-                        value={form.data.currency_code}
-                        onValueChange={(value) =>
-                            form.setData('currency_code', value)
-                        }
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {currencies.map((currency) => (
-                                <SelectItem key={currency} value={currency}>
-                                    {currency}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </Field>
-                <Field
-                    label={
-                        account
-                            ? 'New account number (optional)'
-                            : 'Account number'
-                    }
-                    error={form.errors.account_number}
-                >
-                    <Input
-                        value={form.data.account_number}
-                        onChange={(event) =>
-                            form.setData('account_number', event.target.value)
-                        }
-                        required={!account}
-                    />
-                </Field>
-                <Field label="SWIFT / BIC" error={form.errors.swift_bic}>
-                    <Input
-                        value={form.data.swift_bic}
-                        onChange={(event) =>
-                            form.setData(
-                                'swift_bic',
-                                event.target.value.toUpperCase(),
-                            )
-                        }
-                    />
-                </Field>
-                <Field label="IBAN" error={form.errors.iban}>
-                    <Input
-                        value={form.data.iban}
-                        onChange={(event) =>
-                            form.setData('iban', event.target.value)
-                        }
-                    />
-                </Field>
-                <Field
-                    label="Routing number"
-                    error={form.errors.routing_number}
-                >
-                    <Input
-                        value={form.data.routing_number}
-                        onChange={(event) =>
-                            form.setData('routing_number', event.target.value)
-                        }
-                    />
-                </Field>
-                <Field label="Sort code" error={form.errors.sort_code}>
-                    <Input
-                        value={form.data.sort_code}
-                        onChange={(event) =>
-                            form.setData('sort_code', event.target.value)
-                        }
-                    />
-                </Field>
-            </div>
-            <Field label="Notes" error={form.errors.notes}>
-                <textarea
-                    className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+        <form onSubmit={submit} className="grid gap-8">
+            <FieldSet>
+                <FieldLegend>Identity</FieldLegend>
+                <AccountIdentityFields
+                    form={form}
+                    accountTypes={accountTypes}
+                    currencies={currencies}
+                />
+            </FieldSet>
+
+            <FieldSet>
+                <FieldLegend>Bank details</FieldLegend>
+                <AccountBankFields form={form} />
+            </FieldSet>
+
+            <FieldSet>
+                <FieldLegend>Sensitive identifiers</FieldLegend>
+                <p className="-mt-2 mb-2 text-sm text-muted-foreground">
+                    Stored encrypted and never shown in full once saved.
+                </p>
+                <AccountSensitiveFields form={form} account={account} />
+            </FieldSet>
+
+            <FieldSet>
+                <FieldLegend>Status</FieldLegend>
+                <AccountStatusFields form={form} />
+            </FieldSet>
+
+            <FormField label="Notes" error={form.errors.notes}>
+                <Textarea
                     value={form.data.notes}
                     onChange={(event) =>
                         form.setData('notes', event.target.value)
                     }
                 />
-            </Field>
-            <div className="flex flex-wrap gap-6">
-                <label className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                        checked={form.data.is_primary}
-                        onCheckedChange={(checked) =>
-                            form.setData('is_primary', checked === true)
-                        }
-                    />
-                    Primary account
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                        checked={form.data.is_active}
-                        onCheckedChange={(checked) =>
-                            form.setData('is_active', checked === true)
-                        }
-                    />
-                    Active
-                </label>
-            </div>
+            </FormField>
+
             <Button className="w-fit" disabled={form.processing}>
                 {account ? 'Save changes' : 'Create account'}
             </Button>
         </form>
-    );
-}
-
-function Field({
-    label,
-    error,
-    children,
-}: {
-    label: string;
-    error?: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="grid gap-2">
-            <Label>{label}</Label>
-            {children}
-            <InputError message={error} />
-        </div>
     );
 }

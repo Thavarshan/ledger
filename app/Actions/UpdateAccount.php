@@ -3,7 +3,6 @@
 namespace App\Actions;
 
 use App\Models\Account;
-use App\Models\User;
 use App\Services\AccountAttributePreparer;
 use App\Services\PrimaryAccountManager;
 use Illuminate\Support\Facades\DB;
@@ -21,13 +20,13 @@ final class UpdateAccount
     /**
      * @param  array<string, mixed>  $attributes
      */
-    public function handle(User $owner, Account $account, array $attributes): Account
+    public function handle(Account $account, array $attributes): Account
     {
         $attributes = $this->attributes->prepare($attributes);
 
-        return DB::transaction(function () use ($owner, $account, $attributes): Account {
+        return DB::transaction(function () use ($account, $attributes): Account {
             if (($attributes['is_primary'] ?? false) === true) {
-                $this->primaryAccounts->clearFor($owner, $account);
+                $this->primaryAccounts->clearFor($account->user()->firstOrFail(), $account);
             }
 
             $account->update($attributes);

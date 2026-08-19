@@ -1,26 +1,131 @@
-import { Head } from '@inertiajs/react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeftRight, Landmark, Plus } from 'lucide-react';
+import {
+    create as createAccount,
+    index as accountsIndex,
+} from '@/actions/App/Http/Controllers/AccountController';
+import {
+    create as createTransaction,
+    index as transactionsIndex,
+} from '@/actions/App/Http/Controllers/TransactionController';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Empty,
+    EmptyContent,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyMedia,
+    EmptyTitle,
+} from '@/components/ui/empty';
 import { dashboard } from '@/routes';
 
 export default function Dashboard() {
     return (
         <>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
+            <div className="flex flex-1 flex-col gap-4 p-4">
+                <div>
+                    <h1 className="text-2xl font-semibold">Dashboard</h1>
+                    <p className="text-sm text-muted-foreground">
+                        A starting point for your ledger — add an account and
+                        start recording transactions.
+                    </p>
                 </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Accounts</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Empty className="border-none p-0">
+                                <EmptyHeader>
+                                    <EmptyMedia variant="icon">
+                                        <Landmark />
+                                    </EmptyMedia>
+                                    <EmptyTitle>
+                                        Manage your bank accounts
+                                    </EmptyTitle>
+                                    <EmptyDescription>
+                                        Add the accounts you want to track, then
+                                        record activity against them.
+                                    </EmptyDescription>
+                                </EmptyHeader>
+                                <EmptyContent>
+                                    <div className="flex gap-2">
+                                        <Button asChild>
+                                            <Link href={createAccount()}>
+                                                <Plus />
+                                                Add account
+                                            </Link>
+                                        </Button>
+                                        <Button variant="outline" asChild>
+                                            <Link href={accountsIndex()}>
+                                                View accounts
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </EmptyContent>
+                            </Empty>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Transactions</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Empty className="border-none p-0">
+                                <EmptyHeader>
+                                    <EmptyMedia variant="icon">
+                                        <ArrowLeftRight />
+                                    </EmptyMedia>
+                                    <EmptyTitle>
+                                        Track credits and debits
+                                    </EmptyTitle>
+                                    <EmptyDescription>
+                                        Record a transaction against an account
+                                        to start building your ledger history.
+                                    </EmptyDescription>
+                                </EmptyHeader>
+                                <EmptyContent>
+                                    <div className="flex gap-2">
+                                        <Button asChild>
+                                            <Link href={createTransaction()}>
+                                                <Plus />
+                                                Add transaction
+                                            </Link>
+                                        </Button>
+                                        <Button variant="outline" asChild>
+                                            <Link href={transactionsIndex()}>
+                                                View transactions
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </EmptyContent>
+                            </Empty>
+                        </CardContent>
+                    </Card>
                 </div>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Getting started</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ol className="list-inside list-decimal space-y-1 text-sm text-muted-foreground">
+                            <li>Add a bank account with its currency.</li>
+                            <li>
+                                Record a credit or debit transaction against it.
+                            </li>
+                            <li>
+                                Come back here as your ledger grows to keep an
+                                eye on things.
+                            </li>
+                        </ol>
+                    </CardContent>
+                </Card>
             </div>
         </>
     );

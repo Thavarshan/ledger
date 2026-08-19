@@ -23,7 +23,7 @@ trait HasSearch
     /**
      * Search the model's configured non-sensitive columns.
      *
-     * @param Builder<static> $query
+     * @param  Builder<static>  $query
      */
     #[Scope]
     protected function search(Builder $query, ?string $term): void

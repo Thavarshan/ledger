@@ -2,10 +2,8 @@
 
 namespace App\Actions;
 
+use App\Models\Account;
 use App\Models\Transaction;
-use App\Models\User;
-use App\Services\ActiveOwnedAccount;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -13,20 +11,19 @@ use Illuminate\Support\Facades\DB;
  */
 final class UpdateTransaction
 {
-    public function __construct(private readonly ActiveOwnedAccount $accounts) {}
-
     /**
      * @param  array<string, mixed>  $attributes
      */
-    public function handle(User $owner, Transaction $transaction, array $attributes): Transaction
+    public function handle(Transaction $transaction, array $attributes): Transaction
     {
-        return DB::transaction(function () use ($owner, $transaction, $attributes): Transaction {
-            if (! $transaction->account()->whereBelongsTo($owner)->exists()) {
-                throw (new ModelNotFoundException)->setModel(Transaction::class, [$transaction->getKey()]);
-            }
+        return DB::transaction(function () use ($transaction, $attributes): Transaction {
+            $ownerId = $transaction->account()->value('user_id');
 
             if (array_key_exists('account_id', $attributes) && (int) $attributes['account_id'] !== $transaction->account_id) {
-                $this->accounts->find($owner, (int) $attributes['account_id']);
+                Account::query()
+                    ->active()
+                    ->where('user_id', $ownerId)
+                    ->findOrFail((int) $attributes['account_id']);
             }
 
             $transaction->update($attributes);

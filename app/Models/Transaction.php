@@ -8,7 +8,6 @@ use App\Enums\TransactionDirection;
 use App\Http\Resources\TransactionResource;
 use App\Policies\TransactionPolicy;
 use Database\Factories\TransactionFactory;
-use Filterable\Traits\Filterable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -47,8 +46,6 @@ use Illuminate\Support\Carbon;
 #[UseResource(TransactionResource::class)]
 class Transaction extends Model
 {
-    use Filterable;
-
     /** @use HasFactory<TransactionFactory> */
     use HasFactory;
 

@@ -21,14 +21,6 @@ class IndexTransactionRequest extends FormRequest
     }
 
     /**
-     * Determine whether the user may view transaction listings and forms.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, array<int, string>>

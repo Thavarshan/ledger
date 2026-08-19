@@ -4,6 +4,7 @@ import {
     index,
 } from '@/actions/App/Http/Controllers/AccountController';
 import AccountForm from '@/components/account-form';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function CreateAccount({
     accountTypes,
@@ -22,10 +23,14 @@ export default function CreateAccount({
                         Store the details securely for future use.
                     </p>
                 </div>
-                <AccountForm
-                    accountTypes={accountTypes}
-                    currencies={currencies}
-                />
+                <Card>
+                    <CardContent>
+                        <AccountForm
+                            accountTypes={accountTypes}
+                            currencies={currencies}
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </>
     );

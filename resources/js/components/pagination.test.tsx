@@ -59,5 +59,49 @@ describe('Pagination', () => {
             'href',
             '#',
         );
+        expect(screen.getByText('Showing 1–12 of 13')).toBeInTheDocument();
+    });
+
+    it('renders nothing when there are no results', () => {
+        const { container } = render(
+            <Pagination
+                items={{
+                    data: [],
+                    links: { first: null, last: null, prev: null, next: null },
+                    meta: {
+                        current_page: 1,
+                        last_page: 1,
+                        per_page: 12,
+                        total: 0,
+                        links: [],
+                    },
+                }}
+            />,
+        );
+
+        expect(container).toBeEmptyDOMElement();
+    });
+
+    it('shows the result range without page links for a single page', () => {
+        render(
+            <Pagination
+                items={{
+                    data: [],
+                    links: { first: null, last: null, prev: null, next: null },
+                    meta: {
+                        current_page: 1,
+                        last_page: 1,
+                        per_page: 12,
+                        total: 5,
+                        links: [{ active: true, label: '1', url: '/accounts' }],
+                    },
+                }}
+            />,
+        );
+
+        expect(screen.getByText('Showing 1–5 of 5')).toBeInTheDocument();
+        expect(
+            screen.queryByRole('navigation', { name: 'Pagination' }),
+        ).not.toBeInTheDocument();
     });
 });

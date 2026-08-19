@@ -4,6 +4,7 @@ namespace Tests\Feature\Accounts;
 
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\Account;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\Request;
@@ -58,6 +59,26 @@ class AccountControllerTest extends TestCase
             ->assertJsonPath('component', 'accounts/create')
             ->assertJsonPath('props.accountTypes.0', 'savings')
             ->assertJsonPath('props.currencies.0', 'LKR');
+    }
+
+    public function test_account_pages_include_the_derived_balance_in_minor_units(): void
+    {
+        $user = User::factory()->create();
+        $account = Account::factory()->for($user)->create();
+        Transaction::factory()->forAccount($account)->credit()->create(['amount_minor' => 12500]);
+        Transaction::factory()->forAccount($account)->debit()->create(['amount_minor' => 3250]);
+
+        $this->actingAs($user)
+            ->withHeaders($this->inertiaHeaders())
+            ->get(route('accounts.index'))
+            ->assertOk()
+            ->assertJsonPath('props.accounts.data.0.balance_minor', '9250');
+
+        $this->actingAs($user)
+            ->withHeaders($this->inertiaHeaders())
+            ->get(route('accounts.show', $account))
+            ->assertOk()
+            ->assertJsonPath('props.account.data.balance_minor', '9250');
     }
 
     public function test_owner_can_filter_search_and_sort_accounts(): void

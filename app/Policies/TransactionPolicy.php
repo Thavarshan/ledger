@@ -51,22 +51,6 @@ class TransactionPolicy
     }
 
     /**
-     * Determine whether the user can restore a transaction.
-     */
-    public function restore(User $user, Transaction $transaction): bool
-    {
-        return $this->owns($user, $transaction);
-    }
-
-    /**
-     * Determine whether the user can permanently delete a transaction.
-     */
-    public function forceDelete(User $user, Transaction $transaction): bool
-    {
-        return $this->owns($user, $transaction);
-    }
-
-    /**
      * Determine whether a transaction belongs to the user.
      */
     private function owns(User $user, Transaction $transaction): bool

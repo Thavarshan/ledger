@@ -1,18 +1,27 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { SquarePen, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import {
     destroy,
     edit,
     index,
 } from '@/actions/App/Http/Controllers/TransactionController';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { DirectionBadge } from '@/components/direction-badge';
+import { TransactionAmount } from '@/components/transaction-amount';
 import { Button } from '@/components/ui/button';
-import type { ResourceResponse, Transaction } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDateTime } from '@/lib/date';
+import type { ResourceResponse, TransactionWithAccount } from '@/types';
 
 export default function ShowTransaction({
     transaction,
 }: {
-    transaction: ResourceResponse<Transaction>;
+    transaction: ResourceResponse<TransactionWithAccount>;
 }) {
     const item = transaction.data;
+    const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const currency = item.account.currency_code;
 
     return (
         <>
@@ -23,38 +32,68 @@ export default function ShowTransaction({
                         <h1 className="text-2xl font-semibold">
                             {item.description}
                         </h1>
-                        <p className="text-sm text-muted-foreground">
-                            {item.direction} · {item.amount_minor} minor units
-                        </p>
+                        <div className="mt-2 flex items-center gap-3">
+                            <DirectionBadge direction={item.direction} />
+                            <TransactionAmount
+                                amountMinor={item.amount_minor}
+                                currency={currency}
+                                direction={item.direction}
+                                className="text-lg"
+                            />
+                        </div>
                     </div>
                     <div className="flex gap-2">
                         <Button asChild variant="outline">
-                            <Link href={edit(item)}>Edit</Link>
-                        </Button>
-                        <Button asChild variant="destructive">
-                            <Link
-                                as="button"
-                                href={destroy(item)}
-                                method="delete"
-                            >
-                                Delete
+                            <Link href={edit(item)}>
+                                <SquarePen />
+                                Edit
                             </Link>
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={() => setConfirmingDelete(true)}
+                        >
+                            <Trash2 />
+                            Delete
                         </Button>
                     </div>
                 </div>
-                <dl className="grid gap-4 rounded-xl border p-5 sm:grid-cols-2">
-                    <Detail
-                        label="Account"
-                        value={item.account?.name ?? null}
-                    />
-                    <Detail label="Reference" value={item.reference} />
-                    <Detail
-                        label="Occurred at"
-                        value={new Date(item.occurred_at).toLocaleString()}
-                    />
-                    <Detail label="Notes" value={item.notes} />
-                </dl>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 sm:grid-cols-2">
+                        <Detail label="Account" value={item.account.name} />
+                        <Detail label="Reference" value={item.reference} />
+                        <Detail
+                            label="Occurred at"
+                            value={formatDateTime(item.occurred_at)}
+                        />
+                    </CardContent>
+                </Card>
+
+                {item.notes && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Notes</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm whitespace-pre-line">
+                                {item.notes}
+                            </p>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
+
+            <ConfirmDeleteDialog
+                open={confirmingDelete}
+                onOpenChange={setConfirmingDelete}
+                title="Delete transaction?"
+                description={`This permanently deletes "${item.description}". This cannot be undone.`}
+                onConfirm={() => router.delete(destroy(item).url)}
+            />
         </>
     );
 }
@@ -62,8 +101,8 @@ export default function ShowTransaction({
 function Detail({ label, value }: { label: string; value: string | null }) {
     return (
         <div>
-            <dt className="text-sm text-muted-foreground">{label}</dt>
-            <dd className="font-medium">{value ?? '—'}</dd>
+            <div className="text-sm text-muted-foreground">{label}</div>
+            <div className="font-medium">{value ?? '—'}</div>
         </div>
     );
 }

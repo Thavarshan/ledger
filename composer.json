@@ -11,8 +11,6 @@
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^3.0",
-        "jerome/filterable": "^2.1",
-        "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",

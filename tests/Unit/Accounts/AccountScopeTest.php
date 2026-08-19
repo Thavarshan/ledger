@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Accounts;
 
-use App\Models\Account;
-use Illuminate\Database\Eloquent\Model;
 use App\Concerns\HasSearch;
 use App\Concerns\HasSorting;
+use App\Models\Account;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
 class AccountScopeTest extends TestCase

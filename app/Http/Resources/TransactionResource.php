@@ -31,7 +31,7 @@ class TransactionResource extends JsonResource
             'reference' => $this->reference,
             'notes' => $this->notes,
             'occurred_at' => $this->occurred_at->toISOString(),
-            'account' => $this->whenLoaded('account', fn (): array => AccountSummaryResource::make($this->account)->resolve($request)),
+            'account' => $this->whenLoaded('account', fn (): array => AccountOptionResource::make($this->account)->resolve($request)),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

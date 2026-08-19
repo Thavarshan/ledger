@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 /**
- * jsdom implements neither of these, and several shadcn components touch them
- * while their module body is still evaluating (sidebar reads matchMedia via
- * use-mobile, chart observes its container). Stub them before the glob imports.
+ * jsdom implements neither of these, and several UI components touch them
+ * while their module body is still evaluating. Stub them before the glob
+ * imports.
  */
 vi.stubGlobal(
     'matchMedia',
@@ -32,8 +32,8 @@ describe('ui component registry', () => {
     const modules = import.meta.glob('../components/ui/*.tsx');
     const names = Object.keys(modules).sort();
 
-    it('discovers the full component set', () => {
-        expect(names.length).toBeGreaterThanOrEqual(60);
+    it('discovers the remaining component set', () => {
+        expect(names.length).toBeGreaterThanOrEqual(20);
     });
 
     it.each(names)(

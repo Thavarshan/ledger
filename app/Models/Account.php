@@ -6,10 +6,10 @@ use App\Concerns\HasSearch;
 use App\Concerns\HasSorting;
 use App\Enums\AccountType;
 use App\Enums\CurrencyCode;
+use App\Enums\TransactionDirection;
 use App\Http\Resources\AccountResource;
 use App\Policies\AccountPolicy;
 use Database\Factories\AccountFactory;
-use Filterable\Traits\Filterable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,6 +46,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes
  * @property bool $is_primary
  * @property bool $is_active
+ * @property-read int|null $balance_minor
  * @property-read User $user
  */
 #[Fillable([
@@ -73,15 +75,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[UseResource(AccountResource::class)]
 class Account extends Model
 {
-    /** @var list<string> */
-    public const array TYPES = [
-        'savings',
-        'current',
-        'fixed_deposit',
-    ];
-
-    use Filterable;
-
     /** @use HasFactory<AccountFactory> */
     use HasFactory;
 
@@ -120,6 +113,54 @@ class Account extends Model
     }
 
     /**
+     * Scope the query to include the credit and debit aggregates required for
+     * the derived balance.
+     *
+     * @param  Builder<static>  $query
+     */
+    #[Scope]
+    protected function withBalance(Builder $query): void
+    {
+        $query
+            ->withSum($this->creditTransactionsAggregate(), 'amount_minor')
+            ->withSum($this->debitTransactionsAggregate(), 'amount_minor');
+    }
+
+    /**
+     * Load the credit and debit aggregates required for the derived balance.
+     */
+    public function loadBalance(): static
+    {
+        $this
+            ->loadSum($this->creditTransactionsAggregate(), 'amount_minor')
+            ->loadSum($this->debitTransactionsAggregate(), 'amount_minor');
+
+        return $this;
+    }
+
+    /**
+     * Get the current balance in minor currency units.
+     *
+     * The attribute is available when the account is retrieved through the
+     * withBalance scope or loadBalance method.
+     *
+     * @return Attribute<int|null, never>
+     */
+    protected function balanceMinor(): Attribute
+    {
+        return Attribute::make(
+            get: static function (mixed $value, array $attributes): ?int {
+                if (! array_key_exists('credit_total_minor', $attributes)
+                    || ! array_key_exists('debit_total_minor', $attributes)) {
+                    return null;
+                }
+
+                return (int) $attributes['credit_total_minor'] - (int) $attributes['debit_total_minor'];
+            },
+        );
+    }
+
+    /**
      * Get the non-sensitive columns available to free-text search.
      *
      * @return list<string>
@@ -146,6 +187,36 @@ class Account extends Model
             'country_code' => 'country_code',
             'currency_code' => 'currency_code',
             'created_at' => 'created_at',
+        ];
+    }
+
+    /**
+     * Get the credit aggregate definition used to calculate an account balance.
+     *
+     * @return array<string, \Closure(Builder<Transaction>): Builder<Transaction>>
+     */
+    private function creditTransactionsAggregate(): array
+    {
+        return [
+            'transactions as credit_total_minor' => fn (Builder $query): Builder => $query->where(
+                'direction',
+                TransactionDirection::CREDIT,
+            ),
+        ];
+    }
+
+    /**
+     * Get the debit aggregate definition used to calculate an account balance.
+     *
+     * @return array<string, \Closure(Builder<Transaction>): Builder<Transaction>>
+     */
+    private function debitTransactionsAggregate(): array
+    {
+        return [
+            'transactions as debit_total_minor' => fn (Builder $query): Builder => $query->where(
+                'direction',
+                TransactionDirection::DEBIT,
+            ),
         ];
     }
 
