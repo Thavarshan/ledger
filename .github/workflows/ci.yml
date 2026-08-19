@@ -2,17 +2,23 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
 
+# Configure this workflow as a required check named `CI / gate` on main.
+# Laravel Cloud should be connected to this repository with push-to-deploy
+# enabled only for main; GitHub branch protection then becomes the deployment
+# gate before Cloud receives a merge.
 permissions:
   contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   COMPOSER_NO_INTERACTION: '1'
@@ -21,11 +27,10 @@ env:
   PHP_VERSION: '8.5'
 
 jobs:
-  quality:
-    name: Quality and build
+  php-quality:
+    name: PHP quality
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -40,6 +45,28 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Install PHP dependencies
+        run: composer install --prefer-dist --optimize-autoloader
+
+      - name: Validate Composer configuration
+        run: composer validate --strict --no-check-publish
+
+      - name: Check PHP formatting
+        run: vendor/bin/pint --test --format agent
+
+      - name: Run PHP static analysis
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+  frontend-quality:
+    name: Frontend quality and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -47,36 +74,28 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install PHP dependencies
-        run: composer install --prefer-dist --optimize-autoloader
-
       - name: Install JavaScript dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Validate dependencies
-        run: |
-          composer validate --strict --no-check-publish
-          composer audit --locked
-          npm audit --omit=dev --audit-level=high
+      - name: Check formatting
+        run: npm run format:check
 
-      - name: Check PHP formatting and static analysis
-        run: |
-          vendor/bin/pint --test --format agent
-          vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - name: Check lint
+        run: npm run lint:check
 
-      - name: Check frontend formatting, linting, types, and build
-        run: |
-          npm run format:check
-          npm run lint:check
-          npm run types:check
-          npm run test:frontend
-          npm run build
+      - name: Check TypeScript
+        run: npm run types:check
 
-  test:
+      - name: Run frontend tests
+        run: npm run test:frontend
+
+      - name: Build frontend assets
+        run: npm run build
+
+  backend-tests:
     name: Backend tests (SQLite)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -103,8 +122,8 @@ jobs:
       - name: Run PHPUnit suite
         run: php artisan test --compact
 
-  finance-coverage:
-    name: Finance coverage (PostgreSQL)
+  postgres-finance:
+    name: Finance tests (PostgreSQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -121,38 +140,86 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup PHP with Xdebug
+      - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo_pgsql
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Install PHP dependencies
         run: composer install --prefer-dist --optimize-autoloader
 
-      - name: Configure Laravel test environment
-        run: |
-          cp .env.example .env
-          php artisan key:generate --force
-          php artisan config:clear
+      - name: Run PostgreSQL finance tests
+        run: composer test:finance:postgres
 
-      - name: Run finance coverage gate
-        run: composer coverage:finance
-
-      - name: Upload finance coverage report
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+  security:
+    name: Dependency security audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          name: finance-coverage
-          path: build/coverage/
-          if-no-files-found: error
-          retention-days: 14
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:v2
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Audit Composer dependencies
+        run: composer audit --locked
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install JavaScript dependencies
+        run: npm ci --ignore-scripts --no-fund
+
+      - name: Audit npm dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+  gate:
+    name: Deployment gate
+    if: ${{ always() }}
+    needs:
+      - php-quality
+      - frontend-quality
+      - backend-tests
+      - postgres-finance
+      - security
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every CI job to pass
+        env:
+          PHP_QUALITY: ${{ needs.php-quality.result }}
+          FRONTEND_QUALITY: ${{ needs.frontend-quality.result }}
+          BACKEND_TESTS: ${{ needs.backend-tests.result }}
+          POSTGRES_FINANCE: ${{ needs.postgres-finance.result }}
+          SECURITY: ${{ needs.security.result }}
+        run: |
+          printf 'PHP quality: %s\nFrontend quality: %s\nBackend tests: %s\nPostgreSQL finance: %s\nSecurity: %s\n' \
+            "${PHP_QUALITY}" "${FRONTEND_QUALITY}" "${BACKEND_TESTS}" "${POSTGRES_FINANCE}" "${SECURITY}"
+          test "${PHP_QUALITY}" = success
+          test "${FRONTEND_QUALITY}" = success
+          test "${BACKEND_TESTS}" = success
+          test "${POSTGRES_FINANCE}" = success
+          test "${SECURITY}" = success
