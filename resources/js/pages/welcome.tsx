@@ -55,7 +55,7 @@ export default function Welcome() {
                 <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-6 lg:px-8">
                     <Link href={home()} className="flex items-center gap-2.5">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/20">
-                            <AppLogoIcon className="size-5 fill-current" />
+                            <AppLogoIcon className="size-5 invert dark:invert-0" />
                         </span>
                         <span className="text-base font-semibold tracking-tight">
                             {name}
