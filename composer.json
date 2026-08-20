@@ -1,11 +1,12 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "thavarshan/ledger",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A privacy-conscious personal finance ledger.",
     "keywords": [
-        "laravel",
-        "framework"
+        "finance",
+        "personal-finance",
+        "ledger"
     ],
     "license": "MIT",
     "require": {
