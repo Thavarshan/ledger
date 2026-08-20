@@ -7,12 +7,15 @@ use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Validates profile changes for the currently authenticated web user.
+ */
 class ProfileUpdateRequest extends FormRequest
 {
     use ProfileValidationRules;
 
     /**
-     * Get the validation rules that apply to the request.
+     * Return profile rules scoped to the current user's unique email record.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

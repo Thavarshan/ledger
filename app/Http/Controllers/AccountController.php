@@ -24,7 +24,12 @@ use Inertia\Response;
  */
 class AccountController extends Controller
 {
-    /** Display the authenticated user's paginated account list. */
+    /**
+     * Display the authenticated user's paginated account list.
+     *
+     * Filtering, sorting, and balance aggregation remain in the query service
+     * so the controller only coordinates the request and Inertia response.
+     */
     #[Authorize('viewAny', Account::class)]
     public function index(IndexAccountRequest $request, AccountIndexQuery $accounts): Response
     {
@@ -43,14 +48,21 @@ class AccountController extends Controller
         ]);
     }
 
-    /** Display the account creation form and its enum options. */
+    /**
+     * Display the account creation form and its supported enum options.
+     */
     #[Authorize('create', Account::class)]
     public function create(): Response
     {
         return Inertia::render('accounts/create', $this->formOptions());
     }
 
-    /** Create an account owned by the authenticated user. */
+    /**
+     * Create an account owned by the authenticated user.
+     *
+     * The action manages primary-account replacement and sensitive-field
+     * preparation before persistence.
+     */
     #[Authorize('create', Account::class)]
     public function store(StoreAccountRequest $request, CreateAccount $create): RedirectResponse
     {
@@ -67,14 +79,18 @@ class AccountController extends Controller
         return to_route('accounts.show', $account);
     }
 
-    /** Display one account with its derived balance. */
+    /**
+     * Display one account with its derived balance.
+     */
     #[Authorize('view', 'account')]
     public function show(Account $account): Response
     {
         return Inertia::render('accounts/show', ['account' => AccountResource::make($account->loadBalance())]);
     }
 
-    /** Display the account editing form. */
+    /**
+     * Display the account editing form with the current account values.
+     */
     #[Authorize('update', 'account')]
     public function edit(Account $account): Response
     {
@@ -84,7 +100,12 @@ class AccountController extends Controller
         ]);
     }
 
-    /** Apply validated changes while preserving account invariants. */
+    /**
+     * Apply validated changes while preserving account invariants.
+     *
+     * Authorization is performed by the route attribute before this method is
+     * called, and the action handles the cross-account domain rules.
+     */
     #[Authorize('update', 'account')]
     public function update(UpdateAccountRequest $request, Account $account, UpdateAccount $update): RedirectResponse
     {
@@ -95,7 +116,9 @@ class AccountController extends Controller
         return to_route('accounts.show', $account);
     }
 
-    /** Delete an account owned by the authenticated user. */
+    /**
+     * Delete an account owned by the authenticated user.
+     */
     #[Authorize('delete', 'account')]
     public function destroy(Account $account): RedirectResponse
     {

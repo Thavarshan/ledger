@@ -14,7 +14,12 @@ use Illuminate\Validation\Rule;
  */
 abstract class TransactionRequest extends FormRequest
 {
-    /** Normalize direction and timestamp input before validation. */
+    /**
+     * Normalize direction and timestamp input before validation.
+     *
+     * Normalization keeps the persisted enum and immutable timestamp values
+     * consistent regardless of client casing or display format.
+     */
     protected function prepareForValidation(): void
     {
         $normalized = [];
@@ -31,6 +36,13 @@ abstract class TransactionRequest extends FormRequest
     }
 
     /**
+     * Build the validation rules shared by transaction creation and updates.
+     *
+     * Account ownership is constrained in the database rule, while updates
+     * may retain the transaction's current account even after deactivation.
+     *
+     * @param  bool  $partial  Whether fields may be omitted during an update.
+     * @param  int|null  $currentAccountId  Account allowed for an existing row.
      * @return array<string, array<int, mixed>>
      */
     protected function transactionRules(bool $partial, ?int $currentAccountId = null): array

@@ -18,7 +18,12 @@ class FortifyServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    /** Register Fortify actions, views, and rate limits. */
+    /**
+     * Register Fortify actions, views, and rate limits.
+     *
+     * Fortify remains the session-authentication boundary for the web UI; API
+     * bearer-token issuance is intentionally handled by the versioned API.
+     */
     public function boot(): void
     {
         $this->configureActions();

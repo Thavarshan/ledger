@@ -11,10 +11,18 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Laravel\Sanctum\PersonalAccessToken;
 
-/** Manages user-owned Sanctum token metadata and integration credentials. */
+/**
+ * Manages user-owned Sanctum token metadata and integration credentials.
+ *
+ * Plaintext token values are returned only at creation time and never in lists.
+ */
 class TokenController extends Controller
 {
-    /** List token metadata for the authenticated user. */
+    /**
+     * List token metadata for the authenticated user.
+     *
+     * The response intentionally omits every token secret.
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $this->user($request);
@@ -22,7 +30,12 @@ class TokenController extends Controller
         return ApiTokenResource::collection($user->tokens()->latest()->get());
     }
 
-    /** Create a scoped integration token and expose its secret once. */
+    /**
+     * Create a scoped integration token and expose its secret once.
+     *
+     * Validation prevents delegated tokens from receiving token-management
+     * abilities or expiry values outside the supported integration windows.
+     */
     public function store(CreateTokenRequest $request): JsonResponse
     {
         $user = $this->user($request);
@@ -47,7 +60,9 @@ class TokenController extends Controller
         ], 201);
     }
 
-    /** Revoke an owned integration token. */
+    /**
+     * Revoke an integration token owned by the authenticated user.
+     */
     public function destroy(Request $request, PersonalAccessToken $token): JsonResponse
     {
         abort_unless($token->tokenable_id === $this->user($request)->getKey()
@@ -58,7 +73,9 @@ class TokenController extends Controller
         return response()->json(null, 204);
     }
 
-    /** Resolve the authenticated API principal for token management. */
+    /**
+     * Resolve the authenticated API principal for token management.
+     */
     private function user(Request $request): User
     {
         $user = $request->user();

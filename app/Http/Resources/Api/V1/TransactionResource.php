@@ -8,7 +8,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use function Illuminate\Support\enum_value;
 
-/** Serializes transactions with their required safe account option. */
+/**
+ * Serializes transactions with their required safe account option.
+ *
+ * The resource fails loudly when the account relation was not eager loaded so
+ * API responses cannot accidentally introduce an N+1 query.
+ */
 class TransactionResource extends JsonResource
 {
     /**

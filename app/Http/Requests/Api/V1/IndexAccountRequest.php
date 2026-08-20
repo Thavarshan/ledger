@@ -4,7 +4,12 @@ namespace App\Http\Requests\Api\V1;
 
 use App\Http\Requests\IndexAccountRequest as BaseIndexAccountRequest;
 
-/** Validates API account listing filters and pagination limits. */
+/**
+ * Validates API account listing filters and pagination limits.
+ *
+ * API clients may request larger pages than the web screen, but never more
+ * than the documented maximum of 100 records.
+ */
 class IndexAccountRequest extends BaseIndexAccountRequest
 {
     /**

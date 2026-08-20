@@ -18,6 +18,10 @@ class TransactionResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
+     * The nested account is emitted only when the controller eager-loads it,
+     * which prevents accidental N+1 queries and keeps the contract explicit.
+     *
+     * @param  Request  $request  The current request context.
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array

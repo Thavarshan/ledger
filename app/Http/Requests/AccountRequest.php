@@ -13,7 +13,12 @@ use Illuminate\Validation\Rule;
  */
 abstract class AccountRequest extends FormRequest
 {
-    /** Normalize case-insensitive account codes before validation. */
+    /**
+     * Normalize case-insensitive account and country codes before validation.
+     *
+     * Trimming and uppercasing at the request boundary lets all callers share
+     * the same enum and format validation rules.
+     */
     protected function prepareForValidation(): void
     {
         $normalized = [];
@@ -28,6 +33,12 @@ abstract class AccountRequest extends FormRequest
     }
 
     /**
+     * Build the validation rules shared by account creation and updates.
+     *
+     * Update requests mark writable fields as optional while retaining the
+     * same field constraints used during creation.
+     *
+     * @param  bool  $partial  Whether fields may be omitted during an update.
      * @return array<string, array<int, mixed>>
      */
     protected function accountRules(bool $partial): array

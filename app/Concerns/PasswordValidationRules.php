@@ -5,6 +5,12 @@ namespace App\Concerns;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Shares the password constraints used by profile, reset, and API requests.
+ *
+ * Keeping these rules together prevents password policy drift between the web
+ * and headless authentication entry points.
+ */
 trait PasswordValidationRules
 {
     /**

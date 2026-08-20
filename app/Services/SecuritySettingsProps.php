@@ -7,13 +7,20 @@ use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Features;
 
 /**
- * Builds the security settings presentation contract.
+ * Builds the security-settings presentation contract.
+ *
+ * Feature flags determine whether passkey and two-factor data is included, so
+ * disabled Fortify features never leak stale or irrelevant UI state.
  */
 final class SecuritySettingsProps
 {
     /**
      * Build the security settings presentation payload for a user.
      *
+     * Passkey records contain only display metadata; credentials themselves are
+     * never included in the Inertia response.
+     *
+     * @param  User  $user  The authenticated user whose settings are displayed.
      * @return array<string, mixed>
      */
     public function for(User $user): array

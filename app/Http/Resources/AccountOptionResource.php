@@ -16,6 +16,12 @@ use function Illuminate\Support\enum_value;
 class AccountOptionResource extends JsonResource
 {
     /**
+     * Return the minimal account identity required by a transaction selector.
+     *
+     * Sensitive identifiers, balances, and ownership fields are intentionally
+     * excluded so this resource can safely be nested in API responses.
+     *
+     * @param  Request  $request  The current request context.
      * @return array{id: int, name: string, currency_code: string}
      */
     public function toArray(Request $request): array

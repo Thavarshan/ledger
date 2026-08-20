@@ -8,7 +8,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use function Illuminate\Support\enum_value;
 
-/** Serializes the complete, safe account contract for API clients. */
+/**
+ * Serializes the complete, safe account contract for API clients.
+ *
+ * Encrypted identifiers are represented only by masks and presence flags.
+ */
 class AccountResource extends JsonResource
 {
     /**

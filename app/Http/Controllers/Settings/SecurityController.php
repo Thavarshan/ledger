@@ -12,6 +12,12 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
 
+/**
+ * Handles password and security-settings interactions for the web client.
+ *
+ * Fortify remains the source of truth for feature availability and security
+ * state validation; this controller only assembles the page and redirects.
+ */
 class SecurityController extends Controller
 {
     /**

@@ -13,7 +13,12 @@ use Illuminate\Validation\Rule;
  */
 class IndexAccountRequest extends FormRequest
 {
-    /** Normalize account filters to their canonical uppercase form. */
+    /**
+     * Normalize account filters to their canonical uppercase form.
+     *
+     * Canonical values ensure query scopes behave identically for lowercase and
+     * uppercase client input.
+     */
     protected function prepareForValidation(): void
     {
         $normalized = [];
@@ -29,6 +34,9 @@ class IndexAccountRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * These rules intentionally cover only filtering and sorting; ownership
+     * and pagination limits remain responsibilities of the query service.
      *
      * @return array<string, array<int, string>>
      */

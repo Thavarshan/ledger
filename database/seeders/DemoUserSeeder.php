@@ -13,7 +13,10 @@ class DemoUserSeeder extends Seeder
     public const string EMAIL = 'demo@ledger.test';
 
     /**
-     * Run the database seeds.
+     * Create or refresh the stable user used by demo data.
+     *
+     * updateOrCreate keeps repeated deploy-time seeding idempotent while the
+     * fixed email gives the dependent seeders a deterministic owner.
      */
     public function run(): void
     {

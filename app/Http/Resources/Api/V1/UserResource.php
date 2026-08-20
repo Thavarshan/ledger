@@ -6,7 +6,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** Serializes the public profile fields exposed by the v1 API. */
+/**
+ * Serializes the public profile fields exposed by the v1 API.
+ *
+ * Authentication secrets and encrypted two-factor material remain hidden.
+ */
 class UserResource extends JsonResource
 {
     /**

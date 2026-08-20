@@ -13,7 +13,12 @@ use Illuminate\Validation\Rule;
  */
 class IndexTransactionRequest extends FormRequest
 {
-    /** Normalize direction filters before enum validation. */
+    /**
+     * Normalize direction filters before enum validation.
+     *
+     * Direction values are case-insensitive at the HTTP boundary but canonical
+     * lowercase enum values are passed to the query service.
+     */
     protected function prepareForValidation(): void
     {
         if ($this->filled('direction')) {
@@ -23,6 +28,9 @@ class IndexTransactionRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * The account existence rule is scoped to the authenticated owner so a
+     * filter cannot be used to probe another user's account IDs.
      *
      * @return array<string, array<int, string>>
      */

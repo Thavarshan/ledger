@@ -9,7 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Persists and replays successful API create responses for retry safety. */
+/**
+ * Persists and replays successful API create responses for retry safety.
+ *
+ * Failed requests leave their key available for a corrected retry, while a
+ * successful request can be replayed without creating a duplicate record.
+ */
 class EnsureIdempotencyKey
 {
     /**

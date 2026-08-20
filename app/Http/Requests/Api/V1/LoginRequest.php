@@ -4,7 +4,11 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Validates bearer-token login credentials and optional second factors. */
+/**
+ * Validates bearer-token login credentials and optional second factors.
+ *
+ * The action decides whether a second factor is required for the user.
+ */
 class LoginRequest extends FormRequest
 {
     /**

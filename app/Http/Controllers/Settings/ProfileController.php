@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Handles the authenticated user's profile settings page and mutations.
+ *
+ * Validation is delegated to the settings requests while this controller keeps
+ * the Inertia response and session lifecycle deliberately thin.
+ */
 class ProfileController extends Controller
 {
     /**

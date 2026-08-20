@@ -8,12 +8,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
+ * Generates user records for tests and local development data.
+ *
+ * The factory keeps authentication fields predictable while allowing tests to
+ * opt into verified, unverified, or two-factor-enabled states.
+ *
  * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * Cached hash shared by factory-created users to avoid repeated work.
      */
     protected static ?string $password;
 

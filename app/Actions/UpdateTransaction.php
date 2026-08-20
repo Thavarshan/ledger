@@ -9,14 +9,22 @@ use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
- * Updates a transaction and safely supports account reassignment.
+ * Updates a transaction while preserving account ownership boundaries.
+ *
+ * Reassignment is allowed only to another active account belonging to the
+ * transaction's original owner, preventing ownership changes through input.
  */
 final class UpdateTransaction
 {
     /**
      * Update a transaction while safely validating account reassignment.
      *
+     * The transaction and candidate accounts are locked before validation so
+     * reassignment and account deactivation cannot interleave inconsistently.
+     *
+     * @param  Transaction  $transaction  The transaction being changed.
      * @param  array<string, mixed>  $attributes
+     * @return Transaction The refreshed transaction with its account loaded.
      */
     public function handle(Transaction $transaction, array $attributes): Transaction
     {

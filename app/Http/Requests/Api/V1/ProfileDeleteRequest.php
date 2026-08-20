@@ -4,7 +4,12 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Validates password confirmation before profile deletion. */
+/**
+ * Validates password confirmation before profile deletion.
+ *
+ * The current Sanctum guard ensures the supplied password belongs to the
+ * authenticated API principal.
+ */
 class ProfileDeleteRequest extends FormRequest
 {
     /**

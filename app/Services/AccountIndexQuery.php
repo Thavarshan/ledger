@@ -9,13 +9,21 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Builds the paginated account listing for an owner.
+ *
+ * Filtering, safe sorting, balance aggregation, and query-string preservation
+ * live here so controllers only coordinate authorization and presentation.
  */
 final class AccountIndexQuery
 {
     /**
      * Build the owner's filtered, sorted, balance-aware account paginator.
      *
+     * Criteria are already validated by the caller; this service still checks
+     * scalar types so API and web entry points share a defensive boundary.
+     *
+     * @param  User  $owner  The account owner whose records may be returned.
      * @param  array<string, mixed>  $criteria
+     * @param  int  $perPage  Number of rows per page after caller validation.
      * @return LengthAwarePaginator<int, Account>
      */
     public function paginate(User $owner, array $criteria, int $perPage = 12): LengthAwarePaginator

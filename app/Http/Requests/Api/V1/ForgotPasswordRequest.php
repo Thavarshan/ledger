@@ -4,7 +4,9 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Validates password-reset link requests without revealing account existence. */
+/**
+ * Validates password-reset link requests without revealing account existence.
+ */
 class ForgotPasswordRequest extends FormRequest
 {
     /**

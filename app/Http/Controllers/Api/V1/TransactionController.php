@@ -17,10 +17,18 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
 
-/** Exposes authenticated transaction resources for API v1 clients. */
+/**
+ * Exposes authenticated transaction resources for API v1 clients.
+ *
+ * Existing policies and mutation actions provide the shared web/API rules.
+ */
 class TransactionController extends Controller
 {
-    /** List the authenticated user's transactions. */
+    /**
+     * List the authenticated user's transactions.
+     *
+     * Results remain scoped to accounts owned by the authenticated user.
+     */
     #[Authorize('viewAny', Transaction::class)]
     public function index(IndexTransactionRequest $request, TransactionIndexQuery $transactions): AnonymousResourceCollection
     {
@@ -30,7 +38,11 @@ class TransactionController extends Controller
         return TransactionResource::collection($transactions->paginate($owner, $request->validated(), $perPage));
     }
 
-    /** Create a transaction on an active owned account. */
+    /**
+     * Create a transaction on an active account owned by the user.
+     *
+     * The action validates the account relationship and transaction invariants.
+     */
     #[Authorize('create', Transaction::class)]
     public function store(StoreTransactionRequest $request, CreateTransaction $create): JsonResponse
     {
@@ -42,21 +54,31 @@ class TransactionController extends Controller
             ->header('Location', route('api.v1.transactions.show', $transaction));
     }
 
-    /** Display a transaction with its safe nested account. */
+    /**
+     * Display a transaction with its safe nested account option.
+     *
+     * Sensitive account fields are deliberately excluded by the API resource.
+     */
     #[Authorize('view', 'transaction')]
     public function show(Transaction $transaction): TransactionResource
     {
         return TransactionResource::make($transaction->load('account:id,name,currency_code'));
     }
 
-    /** Apply validated transaction changes and safe account reassignment. */
+    /**
+     * Apply validated transaction changes and safe account reassignment.
+     *
+     * Reassignment is limited to active accounts owned by the original owner.
+     */
     #[Authorize('update', 'transaction')]
     public function update(UpdateTransactionRequest $request, Transaction $transaction, UpdateTransaction $update): TransactionResource
     {
         return TransactionResource::make($update->handle($transaction, $request->validated()));
     }
 
-    /** Delete an owned transaction. */
+    /**
+     * Delete a transaction owned through the authenticated user's account.
+     */
     #[Authorize('delete', 'transaction')]
     public function destroy(Transaction $transaction): JsonResponse
     {
@@ -65,7 +87,9 @@ class TransactionController extends Controller
         return response()->json(null, 204);
     }
 
-    /** Resolve the authenticated API principal for transaction operations. */
+    /**
+     * Resolve the authenticated API principal for transaction operations.
+     */
     private function user(Request $request): User
     {
         $user = $request->user();

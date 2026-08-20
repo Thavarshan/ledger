@@ -6,6 +6,12 @@ use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
+/**
+ * Shares profile name and email validation across web and API requests.
+ *
+ * The optional user ID allows an update to ignore its own unique email row
+ * while still rejecting an address owned by another user.
+ */
 trait ProfileValidationRules
 {
     /**

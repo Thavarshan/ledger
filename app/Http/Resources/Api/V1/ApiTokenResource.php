@@ -6,7 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Laravel\Sanctum\PersonalAccessToken;
 
-/** Serializes token metadata without exposing token secrets. */
+/**
+ * Serializes token metadata without exposing token secrets.
+ *
+ * Plaintext Sanctum values are intentionally available only in the create
+ * response and are never reconstructed from this resource.
+ */
 class ApiTokenResource extends JsonResource
 {
     /**

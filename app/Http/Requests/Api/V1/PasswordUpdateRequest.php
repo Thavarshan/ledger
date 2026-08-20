@@ -5,7 +5,11 @@ namespace App\Http\Requests\Api\V1;
 use App\Concerns\PasswordValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Validates password changes made by authenticated API clients. */
+/**
+ * Validates password changes made by authenticated API clients.
+ *
+ * The shared password rules keep web and API password requirements identical.
+ */
 class PasswordUpdateRequest extends FormRequest
 {
     use PasswordValidationRules;

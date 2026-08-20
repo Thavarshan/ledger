@@ -15,7 +15,10 @@ use Illuminate\Database\Seeder;
 class TransactionSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Create or refresh the demo transaction history.
+     *
+     * Named references make each row idempotent, while the generated tail gives
+     * search, filtering, sorting, and pagination realistic data volume.
      */
     public function run(): void
     {
@@ -43,6 +46,11 @@ class TransactionSeeder extends Seeder
     }
 
     /**
+     * Return the hand-written transactions that explain the demo account data.
+     *
+     * These entries provide recognizable examples for the dashboard before the
+     * deterministic bulk entries are appended.
+     *
      * @return list<array{account: string, direction: TransactionDirection, amount_minor: int, description: string, reference: string, notes: string|null, occurred_at: string}>
      */
     private function transactions(): array

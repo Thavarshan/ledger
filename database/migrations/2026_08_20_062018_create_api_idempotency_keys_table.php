@@ -4,10 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/** Creates the durable store used by API idempotency middleware. */
+/**
+ * Creates the durable store used by API idempotency middleware.
+ *
+ * The user/key uniqueness constraint prevents two concurrent requests from
+ * claiming the same retry key for one account.
+ */
 return new class extends Migration
 {
-    /** Create the idempotency record table and its per-user uniqueness constraint. */
+    /**
+     * Create the idempotency record table and its per-user uniqueness constraint.
+     */
     public function up(): void
     {
         Schema::create('api_idempotency_keys', function (Blueprint $table): void {
@@ -26,7 +33,9 @@ return new class extends Migration
         });
     }
 
-    /** Remove the idempotency record table during rollback. */
+    /**
+     * Remove the idempotency record table during rollback.
+     */
     public function down(): void
     {
         Schema::dropIfExists('api_idempotency_keys');

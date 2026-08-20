@@ -16,6 +16,12 @@ use function Illuminate\Support\enum_value;
 class AccountSummaryResource extends JsonResource
 {
     /**
+     * Return the deterministic account listing contract.
+     *
+     * The derived balance is always present for list consumers, while account
+     * numbers remain limited to the persisted final-four mask.
+     *
+     * @param  Request  $request  The current request context.
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array

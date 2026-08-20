@@ -5,12 +5,18 @@ namespace App\Services;
 use Illuminate\Support\Str;
 
 /**
- * Prepares derived account attributes before persistence.
+ * Prepares account attributes before they reach an Eloquent write operation.
+ *
+ * This service strips fields that clients must not control and derives the
+ * masked account-number suffix used by safe account resources.
  */
 final class AccountAttributePreparer
 {
     /**
      * Remove client-controlled derived fields and prepare masked identifiers.
+     *
+     * The original encrypted account number remains available to the model's
+     * cast while only its final four digits are persisted for display.
      *
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>

@@ -10,13 +10,21 @@ use Illuminate\Support\Carbon;
 
 /**
  * Builds the paginated transaction listing for an owner.
+ *
+ * The query applies ownership, validated filters, safe sorting, and the safe
+ * account projection shared by web and API transaction responses.
  */
 final class TransactionIndexQuery
 {
     /**
      * Build the owner's filtered, sorted, eager-loaded transaction paginator.
      *
+     * Date filters are expanded to complete days so clients can request an
+     * inclusive calendar range without knowing the database timestamp format.
+     *
+     * @param  User  $owner  The owner whose transactions may be returned.
      * @param  array<string, mixed>  $criteria
+     * @param  int  $perPage  Number of rows per page after caller validation.
      * @return LengthAwarePaginator<int, Transaction>
      */
     public function paginate(User $owner, array $criteria, int $perPage = 12): LengthAwarePaginator

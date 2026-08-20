@@ -52,7 +52,11 @@ final class IssueApiToken
         });
     }
 
-    /** @param array<string, mixed> $credentials */
+    /**
+     * Authenticate credentials through the configured web user provider.
+     *
+     * @param  array<string, mixed>  $credentials
+     */
     private function authenticate(array $credentials): User
     {
         $provider = Auth::guard('web')->getProvider();
@@ -72,7 +76,11 @@ final class IssueApiToken
         return $user;
     }
 
-    /** @param array<string, mixed> $credentials */
+    /**
+     * Verify and, for recovery codes, atomically consume the second factor.
+     *
+     * @param  array<string, mixed>  $credentials
+     */
     private function verifySecondFactor(User $user, array $credentials): void
     {
         if (! $user->hasEnabledTwoFactorAuthentication()) {

@@ -8,14 +8,22 @@ use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
- * Creates a transaction on an active account owned by the user.
+ * Persists a transaction against an active account owned by the user.
+ *
+ * Account lookup is performed inside a transaction with a row lock so a
+ * concurrent account deactivation cannot race the mutation.
  */
 final class CreateTransaction
 {
     /**
      * Create a transaction after locking and validating its active account.
      *
+     * The account relation is loaded before returning so every caller receives
+     * the same safe nested account data in the response resource.
+     *
+     * @param  User  $owner  The authenticated owner of the target account.
      * @param  array<string, mixed>  $attributes
+     * @return Transaction The newly persisted transaction with its account loaded.
      */
     public function handle(User $owner, array $attributes): Transaction
     {

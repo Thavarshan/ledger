@@ -5,7 +5,12 @@ namespace App\Http\Requests\Api\V1;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** Validates scoped integration-token creation requests. */
+/**
+ * Validates scoped integration-token creation requests.
+ *
+ * The allowed abilities intentionally exclude tokens:manage so delegated
+ * integrations cannot mint or revoke additional credentials.
+ */
 class CreateTokenRequest extends FormRequest
 {
     /**

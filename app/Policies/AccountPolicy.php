@@ -6,12 +6,18 @@ use App\Models\Account;
 use App\Models\User;
 
 /**
- * Authorizes access to accounts based on ownership.
+ * Authorizes account operations using the account's owning user.
+ *
+ * Collection visibility and creation are handled by authenticated routes;
+ * individual account operations still require an exact owner match.
  */
 class AccountPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the authenticated user may request an account listing.
+     *
+     * The index query applies the owner's scope, so the policy only needs to
+     * confirm that an authenticated actor may enter the operation.
      */
     public function viewAny(User $user): bool
     {
@@ -27,7 +33,9 @@ class AccountPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the authenticated user may create an account.
+     *
+     * Attribute validation and primary-account rules are enforced elsewhere.
      */
     public function create(User $user): bool
     {

@@ -18,7 +18,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    /** Configure application-wide framework defaults. */
+    /**
+     * Configure application-wide framework defaults.
+     *
+     * This boot hook establishes the default string length and the named API
+     * rate limiters used by the HTTP route definitions.
+     */
     public function boot(): void
     {
         $this->configureDefaults();
@@ -49,7 +54,12 @@ class AppServiceProvider extends ServiceProvider
         );
     }
 
-    /** Configure rate limits for the stateless API surface. */
+    /**
+     * Configure rate limits for the stateless API surface.
+     *
+     * Authentication and password-reset limits key by identity and IP, while
+     * authenticated requests key by bearer token and client address.
+     */
     private function configureApiRateLimiting(): void
     {
         RateLimiter::for('api-auth', function (Request $request): Limit {

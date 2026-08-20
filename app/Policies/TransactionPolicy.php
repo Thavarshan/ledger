@@ -6,12 +6,17 @@ use App\Models\Transaction;
 use App\Models\User;
 
 /**
- * Authorizes transactions through their owning account.
+ * Authorizes transaction operations through their owning account.
+ *
+ * Transactions do not store a user ID directly, so ownership is resolved via
+ * the account relation for every model-level authorization decision.
  */
 class TransactionPolicy
 {
     /**
-     * Determine whether the user can view any transactions.
+     * Determine whether the authenticated user may request a transaction list.
+     *
+     * The index query applies the actual owner scope before returning records.
      */
     public function viewAny(User $user): bool
     {
@@ -27,7 +32,9 @@ class TransactionPolicy
     }
 
     /**
-     * Determine whether the user can create transactions.
+     * Determine whether the authenticated user may create a transaction.
+     *
+     * The create action performs the active-account ownership check.
      */
     public function create(User $user): bool
     {

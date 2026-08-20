@@ -8,10 +8,17 @@ use App\Enums\TransactionDirection;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
-/** Provides enum metadata required to build API client forms. */
+/**
+ * Provides enum metadata required to build API client forms.
+ *
+ * Keeping these values server-owned prevents clients from duplicating domain
+ * enum definitions that may change in a future API version.
+ */
 class MetadataController extends Controller
 {
-    /** Return enum values needed by external clients. */
+    /**
+     * Return enum values needed by external clients.
+     */
     public function __invoke(): JsonResponse
     {
         return response()->json([

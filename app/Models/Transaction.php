@@ -46,7 +46,9 @@ use Illuminate\Support\Carbon;
 #[UseResource(TransactionResource::class)]
 class Transaction extends Model
 {
-    /** @use HasFactory<TransactionFactory> */
+    /**
+     * @use HasFactory<TransactionFactory>
+     */
     use HasFactory;
 
     use HasSearch;

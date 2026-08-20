@@ -4,7 +4,12 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Validates password-reset tokens and replacement credentials. */
+/**
+ * Validates password-reset tokens and replacement credentials.
+ *
+ * Token validity itself is checked by Laravel's password broker after request
+ * validation succeeds.
+ */
 class ResetPasswordRequest extends FormRequest
 {
     /**

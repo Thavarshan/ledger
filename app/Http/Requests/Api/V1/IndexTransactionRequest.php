@@ -4,7 +4,9 @@ namespace App\Http\Requests\Api\V1;
 
 use App\Http\Requests\IndexTransactionRequest as BaseIndexTransactionRequest;
 
-/** Validates API transaction listing filters and pagination limits. */
+/**
+ * Validates API transaction listing filters and pagination limits.
+ */
 class IndexTransactionRequest extends BaseIndexTransactionRequest
 {
     /**

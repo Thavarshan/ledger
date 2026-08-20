@@ -13,7 +13,10 @@ use Illuminate\Database\Seeder;
 class AccountSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Create or refresh the demo user's representative account portfolio.
+     *
+     * Existing primary flags are cleared before the designated everyday
+     * account is restored as the single primary account.
      */
     public function run(): void
     {
@@ -32,6 +35,11 @@ class AccountSeeder extends Seeder
     }
 
     /**
+     * Return the deterministic account definitions used by the demo dataset.
+     *
+     * Values intentionally include a mixture of currencies, account types,
+     * optional bank identifiers, and an archived account for UI coverage.
+     *
      * @return array<string, array<string, mixed>>
      */
     private function accounts(): array

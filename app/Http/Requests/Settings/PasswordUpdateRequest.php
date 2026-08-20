@@ -6,12 +6,15 @@ use App\Concerns\PasswordValidationRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Validates the current password and replacement password for web settings.
+ */
 class PasswordUpdateRequest extends FormRequest
 {
     use PasswordValidationRules;
 
     /**
-     * Get the validation rules that apply to the request.
+     * Return rules requiring current-password confirmation and a new password.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

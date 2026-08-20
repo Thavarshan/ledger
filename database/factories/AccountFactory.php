@@ -103,8 +103,9 @@ class AccountFactory extends Factory
 
     /**
      * Generate a numeric string while preserving leading zeroes.
+     *
+     * This is used for account identifiers whose display format is fixed-width.
      */
-    /** Generate a numeric string while preserving leading zeroes. */
     private function numericString(int $length): string
     {
         $value = '';

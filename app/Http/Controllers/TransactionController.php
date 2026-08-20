@@ -23,7 +23,12 @@ use Inertia\Response;
  */
 class TransactionController extends Controller
 {
-    /** Display the authenticated user's filtered transaction list. */
+    /**
+     * Display the authenticated user's filtered transaction list.
+     *
+     * The query service preserves filters and pagination in the generated
+     * links, while form options remain scoped to the same owner.
+     */
     #[Authorize('viewAny', Transaction::class)]
     public function index(IndexTransactionRequest $request, TransactionIndexQuery $transactions, TransactionFormOptions $options): Response
     {
@@ -42,7 +47,9 @@ class TransactionController extends Controller
         ]);
     }
 
-    /** Display the transaction creation form. */
+    /**
+     * Display the transaction creation form and active account options.
+     */
     #[Authorize('create', Transaction::class)]
     public function create(Request $request, TransactionFormOptions $options): Response
     {
@@ -55,7 +62,12 @@ class TransactionController extends Controller
         return Inertia::render('transactions/create', $options->for($owner));
     }
 
-    /** Create a transaction on an active owned account. */
+    /**
+     * Create a transaction on an active account owned by the user.
+     *
+     * The action performs the domain validation that cannot be expressed by
+     * request field rules alone.
+     */
     #[Authorize('create', Transaction::class)]
     public function store(StoreTransactionRequest $request, CreateTransaction $create): RedirectResponse
     {
@@ -72,7 +84,9 @@ class TransactionController extends Controller
         return to_route('transactions.show', $transaction);
     }
 
-    /** Display one transaction with its account option data. */
+    /**
+     * Display one transaction with its safe account option data.
+     */
     #[Authorize('view', 'transaction')]
     public function show(Transaction $transaction): Response
     {
@@ -81,7 +95,9 @@ class TransactionController extends Controller
         ]);
     }
 
-    /** Display the transaction editing form. */
+    /**
+     * Display the transaction editing form and valid account options.
+     */
     #[Authorize('update', 'transaction')]
     public function edit(Request $request, Transaction $transaction, TransactionFormOptions $options): Response
     {
@@ -97,7 +113,12 @@ class TransactionController extends Controller
         ]);
     }
 
-    /** Apply validated transaction changes and any safe account reassignment. */
+    /**
+     * Apply validated transaction changes and any safe account reassignment.
+     *
+     * Reassignment is restricted by the action to active accounts owned by
+     * the transaction's original owner.
+     */
     #[Authorize('update', 'transaction')]
     public function update(UpdateTransactionRequest $request, Transaction $transaction, UpdateTransaction $update): RedirectResponse
     {
@@ -108,7 +129,9 @@ class TransactionController extends Controller
         return to_route('transactions.show', $transaction);
     }
 
-    /** Delete a transaction owned through the authenticated user's account. */
+    /**
+     * Delete a transaction owned through the authenticated user's account.
+     */
     #[Authorize('delete', 'transaction')]
     public function destroy(Transaction $transaction): RedirectResponse
     {

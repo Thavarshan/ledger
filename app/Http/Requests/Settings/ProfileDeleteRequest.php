@@ -6,12 +6,15 @@ use App\Concerns\PasswordValidationRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Validates password confirmation before deleting the web profile.
+ */
 class ProfileDeleteRequest extends FormRequest
 {
     use PasswordValidationRules;
 
     /**
-     * Get the validation rules that apply to the request.
+     * Return the current-password rule required for destructive profile removal.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

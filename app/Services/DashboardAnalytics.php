@@ -22,6 +22,7 @@ final class DashboardAnalytics
      * Balances and flows remain grouped by currency because the ledger does not
      * perform foreign-exchange conversion.
      *
+     * @param  User  $owner  The authenticated user whose dashboard is built.
      * @return array{
      *     summary: array{accounts_count: int, active_accounts_count: int, transactions_count: int},
      *     currencies: list<string>,
@@ -39,7 +40,12 @@ final class DashboardAnalytics
             ->orderBy('name')
             ->get();
 
-        /** @var list<string> $currencies */
+        /**
+         * Currency values are kept separate because the ledger has no exchange
+         * rate source and must not present a misleading combined total.
+         *
+         * @var list<string> $currencies
+         */
         $currencies = array_values($accounts
             ->map(fn (Account $account): string => $this->currency($account))
             ->unique()
@@ -86,7 +92,11 @@ final class DashboardAnalytics
      */
     private function monthlyCurrencyTotals(Collection $transactions, CarbonImmutable $month, array $currencies): array
     {
-        /** @var array<string, array{credits_minor: string, debits_minor: string, net_minor: string}> $totals */
+        /**
+         * Each currency gets a complete set of integer minor-unit totals.
+         *
+         * @var array<string, array{credits_minor: string, debits_minor: string, net_minor: string}> $totals
+         */
         $totals = [];
 
         foreach ($currencies as $currency) {

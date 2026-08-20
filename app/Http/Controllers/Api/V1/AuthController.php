@@ -17,10 +17,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
-/** Handles bearer-token authentication and password recovery for API v1. */
+/**
+ * Handles bearer-token authentication and password recovery for API v1.
+ *
+ * Session-based Fortify authentication remains separate from this controller.
+ */
 class AuthController extends Controller
 {
-    /** Issue a mobile bearer token for an existing user. */
+    /**
+     * Issue a mobile bearer token for an existing user.
+     *
+     * Users with enabled two-factor authentication must provide a valid TOTP
+     * or one-time recovery code before all mobile abilities are granted.
+     */
     public function login(LoginRequest $request, IssueApiToken $issue): JsonResponse
     {
         try {
@@ -44,7 +53,9 @@ class AuthController extends Controller
         ]);
     }
 
-    /** Send a generic password-reset response without revealing account existence. */
+    /**
+     * Send a generic password-reset response without revealing account existence.
+     */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         Password::sendResetLink($request->validated());
@@ -54,7 +65,11 @@ class AuthController extends Controller
         ], 202);
     }
 
-    /** Reset a password using Laravel's configured password broker. */
+    /**
+     * Reset a password using Laravel's configured password broker.
+     *
+     * The shared Fortify reset action also revokes existing API tokens.
+     */
     public function resetPassword(ResetPasswordRequest $request, ResetUserPassword $reset): JsonResponse
     {
         $input = $request->validated();
@@ -92,7 +107,9 @@ class AuthController extends Controller
         return response()->json(null, 204);
     }
 
-    /** Revoke the current bearer token. */
+    /**
+     * Revoke the current bearer token without affecting other devices.
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()?->currentAccessToken()?->delete();

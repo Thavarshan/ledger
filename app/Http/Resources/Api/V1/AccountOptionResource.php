@@ -8,7 +8,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use function Illuminate\Support\enum_value;
 
-/** Serializes the minimal account contract embedded in transaction responses. */
+/**
+ * Serializes the minimal account contract embedded in transaction responses.
+ *
+ * This resource is intentionally limited to fields safe for form options and
+ * nested transaction context.
+ */
 class AccountOptionResource extends JsonResource
 {
     /**

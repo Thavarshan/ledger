@@ -5,7 +5,12 @@ namespace App\Http\Requests\Api\V1;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Validates editable authenticated-user profile fields. */
+/**
+ * Validates editable authenticated-user profile fields.
+ *
+ * Email uniqueness excludes the current user so unchanged profile updates are
+ * accepted without weakening the database-backed uniqueness rule.
+ */
 class ProfileUpdateRequest extends FormRequest
 {
     /**

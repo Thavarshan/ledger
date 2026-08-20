@@ -5,6 +5,12 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
+/**
+ * Defines the shared Inertia props and root template for web requests.
+ *
+ * Only presentation-safe identity and navigation state are shared globally;
+ * page-specific data remains owned by its controller.
+ */
 class HandleInertiaRequests extends Middleware
 {
     /**

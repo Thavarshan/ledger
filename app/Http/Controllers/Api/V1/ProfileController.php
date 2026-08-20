@@ -12,16 +12,24 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-/** Handles authenticated profile reads, updates, and deletion. */
+/**
+ * Handles authenticated profile reads, updates, password changes, and deletion.
+ *
+ * Profile mutations revoke bearer tokens when credentials or the user change.
+ */
 class ProfileController extends Controller
 {
-    /** Return the authenticated user's public profile. */
+    /**
+     * Return the authenticated user's public profile.
+     */
     public function show(Request $request): UserResource
     {
         return UserResource::make($this->user($request));
     }
 
-    /** Update the authenticated user's profile. */
+    /**
+     * Update the authenticated user's editable profile fields.
+     */
     public function update(ProfileUpdateRequest $request): UserResource
     {
         $user = $this->user($request);
@@ -30,7 +38,12 @@ class ProfileController extends Controller
         return UserResource::make($user->refresh());
     }
 
-    /** Change the password and revoke all bearer tokens. */
+    /**
+     * Change the password after current-password confirmation.
+     *
+     * Every existing API token is revoked in the same transaction so an old
+     * credential cannot remain usable after the password changes.
+     */
     public function updatePassword(PasswordUpdateRequest $request): JsonResponse
     {
         $user = $this->user($request);
@@ -43,7 +56,9 @@ class ProfileController extends Controller
         return response()->json(null, 204);
     }
 
-    /** Delete the authenticated user's profile and owned data. */
+    /**
+     * Delete the authenticated user's profile and owned data atomically.
+     */
     public function destroy(ProfileDeleteRequest $request): JsonResponse
     {
         $user = $this->user($request);
@@ -56,7 +71,9 @@ class ProfileController extends Controller
         return response()->json(null, 204);
     }
 
-    /** Resolve the authenticated API principal for profile operations. */
+    /**
+     * Resolve the authenticated API principal for profile operations.
+     */
     private function user(Request $request): User
     {
         $user = $request->user();

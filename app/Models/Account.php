@@ -75,7 +75,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[UseResource(AccountResource::class)]
 class Account extends Model
 {
-    /** @use HasFactory<AccountFactory> */
+    /**
+     * @use HasFactory<AccountFactory>
+     */
     use HasFactory;
 
     use HasSearch;
@@ -161,7 +163,12 @@ class Account extends Model
         );
     }
 
-    /** Convert database aggregate values into safe integer balance components. */
+    /**
+     * Convert a database aggregate value into an integer balance component.
+     *
+     * PostgreSQL may return numeric aggregates as strings, while SQLite may
+     * return integers. Invalid or missing values contribute zero to the balance.
+     */
     private static function toInteger(mixed $value): int
     {
         return is_int($value) ? $value : (is_string($value) && is_numeric($value) ? (int) $value : 0);
