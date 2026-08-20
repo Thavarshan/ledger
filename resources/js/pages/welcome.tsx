@@ -82,11 +82,11 @@ export default function Welcome() {
                     <section className="relative isolate mx-auto grid max-w-7xl gap-12 px-5 pt-14 pb-20 sm:px-6 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-20 lg:px-8 lg:pt-24 lg:pb-32">
                         <div
                             aria-hidden="true"
-                            className="pointer-events-none absolute -top-32 right-0 -z-10 size-[34rem] rounded-full bg-primary/10 blur-3xl dark:bg-primary/15"
+                            className="pointer-events-none absolute -top-24 right-0 -z-10 size-[28rem] rounded-full bg-emerald-500/10 blur-3xl dark:bg-emerald-400/10"
                         />
                         <div
                             aria-hidden="true"
-                            className="pointer-events-none absolute bottom-0 left-0 -z-10 size-64 rounded-full bg-chart-2/10 blur-3xl"
+                            className="pointer-events-none absolute bottom-0 left-0 -z-10 size-56 rounded-full bg-cyan-500/10 blur-3xl"
                         />
                         <div className="relative z-10 flex flex-col items-start">
                             <Badge
@@ -241,29 +241,31 @@ export default function Welcome() {
                     </section>
 
                     <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
-                        <Card className="relative isolate items-center overflow-hidden bg-primary px-6 py-12 text-center text-primary-foreground shadow-lg shadow-primary/20 sm:px-12">
+                        <Card className="relative isolate overflow-hidden bg-foreground px-6 py-10 text-background shadow-lg shadow-foreground/20 sm:px-10 lg:py-12">
                             <div
                                 aria-hidden="true"
-                                className="pointer-events-none absolute -top-24 left-1/2 -z-10 size-72 -translate-x-1/2 rounded-full bg-white/15 blur-3xl"
+                                className="pointer-events-none absolute -top-32 right-10 -z-10 size-72 rounded-full bg-emerald-400/15 blur-3xl"
                             />
-                            <WalletCards className="size-8" />
-                            <CardHeader className="max-w-xl px-0 text-center">
-                                <CardTitle className="text-3xl tracking-tight text-primary-foreground sm:text-4xl">
-                                    Your money deserves a clearer picture.
-                                </CardTitle>
-                                <CardDescription className="text-base leading-7 text-primary-foreground/75">
-                                    Create a deliberate record of where your
-                                    money is and where it goes.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="px-0">
+                            <div className="grid w-full items-center gap-8 md:grid-cols-[auto_1fr_auto] md:gap-10">
+                                <span className="flex size-14 items-center justify-center rounded-2xl bg-background/10 text-background">
+                                    <WalletCards className="size-7" />
+                                </span>
+                                <div className="max-w-2xl space-y-3">
+                                    <h2 className="text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">
+                                        Your money deserves a clearer picture.
+                                    </h2>
+                                    <p className="max-w-xl text-base leading-7 text-background/70">
+                                        Create a deliberate record of where your
+                                        money is and where it goes.
+                                    </p>
+                                </div>
                                 <Button asChild variant="secondary" size="lg">
                                     <Link href={destination}>
                                         {destinationLabel}
                                         <ArrowRight />
                                     </Link>
                                 </Button>
-                            </CardContent>
+                            </div>
                         </Card>
                     </section>
                 </main>
