@@ -6,12 +6,14 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  release:
+    types: [published]
   schedule:
     - cron: '17 3 * * 1'
 
 # Configure this workflow as a required check named `CI / gate` on main.
-# The deploy job calls Laravel Cloud only after this gate succeeds, ensuring
-# production receives the exact commit validated by CI.
+# The deploy job runs only for published releases after this gate succeeds,
+# ensuring production receives an explicitly versioned commit.
 permissions:
   contents: read
 
@@ -272,7 +274,7 @@ jobs:
 
   deploy:
     name: Deploy production
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
     needs: gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
