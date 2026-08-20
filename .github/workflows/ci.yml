@@ -244,6 +244,29 @@ jobs:
       - name: Audit npm dependencies
         run: npm audit --omit=dev --audit-level=high
 
+  api-contract:
+    name: API contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install JavaScript dependencies
+        run: npm ci --ignore-scripts --no-fund
+
+      - name: Lint OpenAPI and verify generated Postman collection
+        run: npm run api:check
+
   gate:
     name: Deployment gate
     if: ${{ always() }}
@@ -253,6 +276,7 @@ jobs:
       - backend-tests
       - postgres-finance
       - security
+      - api-contract
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -263,14 +287,16 @@ jobs:
           BACKEND_TESTS: ${{ needs.backend-tests.result }}
           POSTGRES_FINANCE: ${{ needs.postgres-finance.result }}
           SECURITY: ${{ needs.security.result }}
+          API_CONTRACT: ${{ needs.api-contract.result }}
         run: |
-          printf 'PHP quality: %s\nFrontend quality: %s\nBackend tests: %s\nPostgreSQL finance: %s\nSecurity: %s\n' \
-            "${PHP_QUALITY}" "${FRONTEND_QUALITY}" "${BACKEND_TESTS}" "${POSTGRES_FINANCE}" "${SECURITY}"
+          printf 'PHP quality: %s\nFrontend quality: %s\nBackend tests: %s\nPostgreSQL finance: %s\nSecurity: %s\nAPI contract: %s\n' \
+            "${PHP_QUALITY}" "${FRONTEND_QUALITY}" "${BACKEND_TESTS}" "${POSTGRES_FINANCE}" "${SECURITY}" "${API_CONTRACT}"
           test "${PHP_QUALITY}" = success
           test "${FRONTEND_QUALITY}" = success
           test "${BACKEND_TESTS}" = success
           test "${POSTGRES_FINANCE}" = success
           test "${SECURITY}" = success
+          test "${API_CONTRACT}" = success
 
   deploy:
     name: Deploy production

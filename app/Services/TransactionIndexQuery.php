@@ -19,7 +19,7 @@ final class TransactionIndexQuery
      * @param  array<string, mixed>  $criteria
      * @return LengthAwarePaginator<int, Transaction>
      */
-    public function paginate(User $owner, array $criteria): LengthAwarePaginator
+    public function paginate(User $owner, array $criteria, int $perPage = 12): LengthAwarePaginator
     {
         $accountId = $criteria['account_id'] ?? null;
         $accountId = is_int($accountId) || is_string($accountId) ? $accountId : null;
@@ -42,7 +42,7 @@ final class TransactionIndexQuery
             ->when($occurredTo, fn (Builder $query, mixed $value): Builder => $query->where('occurred_at', '<=', Carbon::parse((string) $value)->endOfDay()))
             ->search($search)
             ->sorted($sort)
-            ->paginate(12)
+            ->paginate($perPage)
             ->withQueryString();
     }
 }

@@ -18,13 +18,14 @@ final class AccountIndexQuery
      * @param  array<string, mixed>  $criteria
      * @return LengthAwarePaginator<int, Account>
      */
-    public function paginate(User $owner, array $criteria): LengthAwarePaginator
+    public function paginate(User $owner, array $criteria, int $perPage = 12): LengthAwarePaginator
     {
         $accountType = is_string($criteria['account_type'] ?? null) ? $criteria['account_type'] : null;
         $countryCode = is_string($criteria['country_code'] ?? null) ? $criteria['country_code'] : null;
         $currencyCode = is_string($criteria['currency_code'] ?? null) ? $criteria['currency_code'] : null;
         $search = is_string($criteria['search'] ?? null) ? $criteria['search'] : null;
         $sort = is_string($criteria['sort'] ?? null) ? $criteria['sort'] : null;
+        $isActive = is_bool($criteria['is_active'] ?? null) ? $criteria['is_active'] : null;
 
         return Account::query()
             ->select([
@@ -35,10 +36,11 @@ final class AccountIndexQuery
             ->when($accountType, fn (Builder $query, mixed $value): Builder => $query->where('account_type', $value))
             ->when($countryCode, fn (Builder $query, mixed $value): Builder => $query->where('country_code', $value))
             ->when($currencyCode, fn (Builder $query, mixed $value): Builder => $query->where('currency_code', $value))
+            ->when($isActive !== null, fn (Builder $query): Builder => $query->where('is_active', $isActive))
             ->search($search)
             ->sorted($sort)
             ->withBalance()
-            ->paginate(12)
+            ->paginate($perPage)
             ->withQueryString();
     }
 }

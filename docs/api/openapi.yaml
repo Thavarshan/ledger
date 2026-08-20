@@ -1,0 +1,713 @@
+openapi: 3.0.3
+info:
+  title: Ledger API
+  version: 1.0.0
+  description: Versioned bearer-token API for Ledger mobile and external clients.
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
+servers:
+  - url: https://ledger-production-syzyqv.laravel.cloud/api/v1
+    description: Production
+tags:
+  - name: Authentication
+    description: Stateless token issuance and password reset.
+  - name: Profile
+    description: Authenticated user profile operations.
+  - name: Tokens
+    description: Scoped integration-token management.
+  - name: Metadata
+    description: Supported enum values.
+  - name: Accounts
+    description: Owned bank-account operations.
+  - name: Transactions
+    description: Owned transaction operations.
+paths:
+  /auth/login:
+    post:
+      tags: [Authentication]
+      security: []
+      operationId: login
+      summary: Issue a mobile token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '409':
+          $ref: '#/components/responses/TwoFactorRequired'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/forgot-password:
+    post:
+      tags: [Authentication]
+      security: []
+      operationId: forgotPassword
+      summary: Request a password-reset link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+      responses:
+        '202':
+          description: Generic accepted response
+  /auth/reset-password:
+    post:
+      tags: [Authentication]
+      security: []
+      operationId: resetPassword
+      summary: Reset a password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: Password reset
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      operationId: logout
+      summary: Revoke the current token
+      responses:
+        '204':
+          description: Token revoked
+      security:
+        - bearerAuth: []
+  /me:
+    get:
+      tags: [Profile]
+      operationId: getProfile
+      summary: Get the current profile
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags: [Profile]
+      operationId: updateProfile
+      summary: Update the current profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags: [Profile]
+      operationId: deleteProfile
+      summary: Delete the current profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDeleteRequest'
+      responses:
+        '204':
+          description: Profile deleted
+      security:
+        - bearerAuth: []
+  /me/password:
+    put:
+      tags: [Profile]
+      operationId: updatePassword
+      summary: Change the current password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdateRequest'
+      responses:
+        '204':
+          description: Password changed and tokens revoked
+      security:
+        - bearerAuth: []
+  /tokens:
+    get:
+      tags: [Tokens]
+      operationId: listTokens
+      summary: List token metadata
+      responses:
+        '200':
+          description: Token metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenCollection'
+      security:
+        - bearerAuth: []
+    post:
+      tags: [Tokens]
+      operationId: createToken
+      summary: Create a scoped integration token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTokenRequest'
+      responses:
+        '201':
+          description: Token created; plaintext is returned once
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+      security:
+        - bearerAuth: []
+  /tokens/{token}:
+    delete:
+      tags: [Tokens]
+      operationId: revokeToken
+      summary: Revoke an owned token
+      parameters:
+        - $ref: '#/components/parameters/TokenId'
+      responses:
+        '204':
+          description: Token revoked
+      security:
+        - bearerAuth: []
+  /metadata:
+    get:
+      tags: [Metadata]
+      operationId: getMetadata
+      summary: Get supported enum values
+      responses:
+        '200':
+          description: API metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataResponse'
+      security:
+        - bearerAuth: []
+  /accounts:
+    get:
+      tags: [Accounts]
+      operationId: listAccounts
+      summary: List owned accounts
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/AccountSort'
+        - $ref: '#/components/parameters/AccountType'
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/CurrencyCode'
+        - $ref: '#/components/parameters/IsActive'
+      responses:
+        '200':
+          description: Paginated accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCollection'
+      security:
+        - bearerAuth: []
+    post:
+      tags: [Accounts]
+      operationId: createAccount
+      summary: Create an account
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '201':
+          description: Account created
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+      security:
+        - bearerAuth: []
+  /accounts/{account}:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      tags: [Accounts]
+      operationId: getAccount
+      summary: Get an owned account
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags: [Accounts]
+      operationId: updateAccount
+      summary: Update an owned account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdateRequest'
+      responses:
+        '200':
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags: [Accounts]
+      operationId: deleteAccount
+      summary: Delete an owned account
+      responses:
+        '204':
+          description: Account deleted
+      security:
+        - bearerAuth: []
+  /transactions:
+    get:
+      tags: [Transactions]
+      operationId: listTransactions
+      summary: List owned transactions
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/TransactionSort'
+        - $ref: '#/components/parameters/AccountFilter'
+        - $ref: '#/components/parameters/Direction'
+        - $ref: '#/components/parameters/OccurredFrom'
+        - $ref: '#/components/parameters/OccurredTo'
+      responses:
+        '200':
+          description: Paginated transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionCollection'
+      security:
+        - bearerAuth: []
+    post:
+      tags: [Transactions]
+      operationId: createTransaction
+      summary: Create a transaction
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transaction created
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+      security:
+        - bearerAuth: []
+  /transactions/{transaction}:
+    parameters:
+      - $ref: '#/components/parameters/TransactionId'
+    get:
+      tags: [Transactions]
+      operationId: getTransaction
+      summary: Get an owned transaction
+      responses:
+        '200':
+          description: Transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags: [Transactions]
+      operationId: updateTransaction
+      summary: Update an owned transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionUpdateRequest'
+      responses:
+        '200':
+          description: Updated transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags: [Transactions]
+      operationId: deleteTransaction
+      summary: Delete an owned transaction
+      responses:
+        '204':
+          description: Transaction deleted
+      security:
+        - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: {type: integer, minimum: 1, default: 1}
+    PerPage:
+      name: per_page
+      in: query
+      schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+    Search:
+      name: search
+      in: query
+      schema: {type: string, maxLength: 100}
+    AccountSort:
+      name: sort
+      in: query
+      schema: {type: string, pattern: '^(name|bank_name|country_code|currency_code|created_at):(asc|desc)$'}
+    TransactionSort:
+      name: sort
+      in: query
+      schema: {type: string, pattern: '^(occurred_at|amount_minor|description|created_at):(asc|desc)$'}
+    AccountType:
+      name: account_type
+      in: query
+      schema: {type: string, enum: [savings, current, fixed_deposit]}
+    CountryCode:
+      name: country_code
+      in: query
+      schema: {type: string, minLength: 2, maxLength: 2}
+    CurrencyCode:
+      name: currency_code
+      in: query
+      schema: {type: string, enum: [LKR, USD, EUR, GBP, AUD, CAD, CHF, CNY, JPY, SGD, AED, SAR, INR, NZD, ZAR, HKD, MYR, THB, QAR, KWD, BHD, OMR, PKR, BDT]}
+    IsActive:
+      name: is_active
+      in: query
+      schema: {type: boolean}
+    AccountFilter:
+      name: account_id
+      in: query
+      schema: {type: integer}
+    Direction:
+      name: direction
+      in: query
+      schema: {type: string, enum: [credit, debit]}
+    OccurredFrom:
+      name: occurred_from
+      in: query
+      schema: {type: string, format: date}
+    OccurredTo:
+      name: occurred_to
+      in: query
+      schema: {type: string, format: date}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 8, maxLength: 128}
+    AccountId:
+      name: account
+      in: path
+      required: true
+      schema: {type: integer}
+    TransactionId:
+      name: transaction
+      in: path
+      required: true
+      schema: {type: integer}
+    TokenId:
+      name: token
+      in: path
+      required: true
+      schema: {type: integer}
+  headers:
+    Location:
+      description: URL of the created resource
+      schema: {type: string, format: uri}
+  responses:
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ValidationError'}
+    TwoFactorRequired:
+      description: A second factor is required
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/CodeError'}
+    IdempotencyConflict:
+      description: Idempotency key conflict
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/CodeError'}
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password, device_name]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+        device_name: {type: string, maxLength: 100}
+        code: {type: string, pattern: '^[0-9]{6}$'}
+        recovery_code: {type: string}
+    EmailRequest:
+      type: object
+      required: [email]
+      properties: {email: {type: string, format: email}}
+    ResetPasswordRequest:
+      type: object
+      required: [token, email, password, password_confirmation]
+      properties:
+        token: {type: string}
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+        password_confirmation: {type: string, format: password}
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        name: {type: string, maxLength: 255}
+        email: {type: string, format: email}
+    PasswordUpdateRequest:
+      type: object
+      required: [current_password, password, password_confirmation]
+      properties:
+        current_password: {type: string, format: password}
+        password: {type: string, format: password}
+        password_confirmation: {type: string, format: password}
+    ProfileDeleteRequest:
+      type: object
+      required: [password]
+      properties: {password: {type: string, format: password}}
+    CreateTokenRequest:
+      type: object
+      required: [name, abilities, current_password]
+      properties:
+        name: {type: string, maxLength: 100}
+        abilities:
+          type: array
+          minItems: 1
+          items: {type: string}
+        expires_in_days: {type: integer, enum: [30, 90, 365], default: 90}
+        current_password: {type: string, format: password}
+    AccountRequest:
+      type: object
+      required: [name, account_type, bank_name, country_code, currency_code, account_number]
+      properties:
+        name: {type: string}
+        account_type: {type: string}
+        account_holder_name: {type: string, nullable: true}
+        bank_name: {type: string}
+        bank_code: {type: string, nullable: true}
+        branch_name: {type: string, nullable: true}
+        branch_code: {type: string, nullable: true}
+        country_code: {type: string}
+        currency_code: {type: string}
+        account_number: {type: string, writeOnly: true}
+        iban: {type: string, nullable: true, writeOnly: true}
+        swift_bic: {type: string, nullable: true}
+        routing_number: {type: string, nullable: true, writeOnly: true}
+        sort_code: {type: string, nullable: true, writeOnly: true}
+        notes: {type: string, nullable: true}
+        is_primary: {type: boolean}
+        is_active: {type: boolean}
+    AccountUpdateRequest:
+      allOf: [{$ref: '#/components/schemas/AccountRequest'}]
+    Account:
+      type: object
+      required: [id, name, account_type, bank_name, country_code, currency_code, is_primary, is_active, balance_minor]
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        account_type: {type: string}
+        account_holder_name: {type: string, nullable: true}
+        bank_name: {type: string}
+        bank_code: {type: string, nullable: true}
+        branch_name: {type: string, nullable: true}
+        branch_code: {type: string, nullable: true}
+        country_code: {type: string}
+        currency_code: {type: string}
+        account_number_last4: {type: string, nullable: true}
+        has_iban: {type: boolean}
+        swift_bic: {type: string, nullable: true}
+        has_routing_number: {type: boolean}
+        has_sort_code: {type: boolean}
+        notes: {type: string, nullable: true}
+        is_primary: {type: boolean}
+        is_active: {type: boolean}
+        balance_minor: {type: string, pattern: '^-?[0-9]+$'}
+        created_at: {type: string, format: date-time, nullable: true}
+        updated_at: {type: string, format: date-time, nullable: true}
+    AccountOption:
+      type: object
+      required: [id, name, currency_code]
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        currency_code: {type: string}
+    TransactionRequest:
+      type: object
+      required: [account_id, direction, amount_minor, description, occurred_at]
+      properties:
+        account_id: {type: integer}
+        direction: {type: string, enum: [credit, debit]}
+        amount_minor: {type: string, pattern: '^[1-9][0-9]*$'}
+        description: {type: string}
+        reference: {type: string, nullable: true}
+        notes: {type: string, nullable: true}
+        occurred_at: {type: string, format: date-time}
+    TransactionUpdateRequest:
+      allOf: [{$ref: '#/components/schemas/TransactionRequest'}]
+    Transaction:
+      type: object
+      required: [id, account_id, direction, amount_minor, description, occurred_at, account]
+      properties:
+        id: {type: integer}
+        account_id: {type: integer}
+        direction: {type: string}
+        amount_minor: {type: string, pattern: '^-?[0-9]+$'}
+        description: {type: string}
+        reference: {type: string, nullable: true}
+        notes: {type: string, nullable: true}
+        occurred_at: {type: string, format: date-time}
+        account: {$ref: '#/components/schemas/AccountOption'}
+        created_at: {type: string, format: date-time, nullable: true}
+        updated_at: {type: string, format: date-time, nullable: true}
+    User:
+      type: object
+      required: [id, name, email, two_factor_enabled]
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        email: {type: string, format: email}
+        two_factor_enabled: {type: boolean}
+        created_at: {type: string, format: date-time, nullable: true}
+        updated_at: {type: string, format: date-time, nullable: true}
+    ApiToken:
+      type: object
+      required: [id, name, abilities]
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        abilities: {type: array, items: {type: string}}
+        last_used_at: {type: string, format: date-time, nullable: true}
+        expires_at: {type: string, format: date-time, nullable: true}
+        created_at: {type: string, format: date-time, nullable: true}
+    TokenResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [token, token_type, expires_at]
+          properties:
+            token: {type: string}
+            token_type: {type: string, example: Bearer}
+            expires_at: {type: string, format: date-time}
+            user: {$ref: '#/components/schemas/User'}
+    UserResponse:
+      type: object
+      required: [data]
+      properties: {data: {$ref: '#/components/schemas/User'}}
+    AccountResponse:
+      type: object
+      required: [data]
+      properties: {data: {$ref: '#/components/schemas/Account'}}
+    TransactionResponse:
+      type: object
+      required: [data]
+      properties: {data: {$ref: '#/components/schemas/Transaction'}}
+    AccountCollection:
+      allOf: [{$ref: '#/components/schemas/PaginatedResponse'}]
+    TransactionCollection:
+      allOf: [{$ref: '#/components/schemas/PaginatedResponse'}]
+    TokenCollection:
+      type: object
+      required: [data]
+      properties:
+        data: {type: array, items: {$ref: '#/components/schemas/ApiToken'}}
+    MetadataResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [account_types, currencies, transaction_directions]
+          properties:
+            account_types: {type: array, items: {type: string}}
+            currencies: {type: array, items: {type: string}}
+            transaction_directions: {type: array, items: {type: string}}
+    PaginatedResponse:
+      type: object
+      required: [data, links, meta]
+      properties:
+        data: {type: array, items: {type: object}}
+        links: {type: object}
+        meta: {type: object}
+    ValidationError:
+      type: object
+      required: [message, errors]
+      properties:
+        message: {type: string}
+        errors: {type: object, additionalProperties: {type: array, items: {type: string}}}
+    CodeError:
+      type: object
+      required: [message, code]
+      properties:
+        message: {type: string}
+        code: {type: string}
