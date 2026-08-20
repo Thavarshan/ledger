@@ -23,6 +23,7 @@ use Inertia\Response;
  */
 class TransactionController extends Controller
 {
+    /** Display the authenticated user's filtered transaction list. */
     #[Authorize('viewAny', Transaction::class)]
     public function index(IndexTransactionRequest $request, TransactionIndexQuery $transactions, TransactionFormOptions $options): Response
     {
@@ -41,6 +42,7 @@ class TransactionController extends Controller
         ]);
     }
 
+    /** Display the transaction creation form. */
     #[Authorize('create', Transaction::class)]
     public function create(Request $request, TransactionFormOptions $options): Response
     {
@@ -53,6 +55,7 @@ class TransactionController extends Controller
         return Inertia::render('transactions/create', $options->for($owner));
     }
 
+    /** Create a transaction on an active owned account. */
     #[Authorize('create', Transaction::class)]
     public function store(StoreTransactionRequest $request, CreateTransaction $create): RedirectResponse
     {
@@ -69,6 +72,7 @@ class TransactionController extends Controller
         return to_route('transactions.show', $transaction);
     }
 
+    /** Display one transaction with its account option data. */
     #[Authorize('view', 'transaction')]
     public function show(Transaction $transaction): Response
     {
@@ -77,6 +81,7 @@ class TransactionController extends Controller
         ]);
     }
 
+    /** Display the transaction editing form. */
     #[Authorize('update', 'transaction')]
     public function edit(Request $request, Transaction $transaction, TransactionFormOptions $options): Response
     {
@@ -92,6 +97,7 @@ class TransactionController extends Controller
         ]);
     }
 
+    /** Apply validated transaction changes and any safe account reassignment. */
     #[Authorize('update', 'transaction')]
     public function update(UpdateTransactionRequest $request, Transaction $transaction, UpdateTransaction $update): RedirectResponse
     {
@@ -102,6 +108,7 @@ class TransactionController extends Controller
         return to_route('transactions.show', $transaction);
     }
 
+    /** Delete a transaction owned through the authenticated user's account. */
     #[Authorize('delete', 'transaction')]
     public function destroy(Transaction $transaction): RedirectResponse
     {

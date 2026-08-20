@@ -12,6 +12,8 @@ use Laravel\Fortify\Features;
 final class SecuritySettingsProps
 {
     /**
+     * Build the security settings presentation payload for a user.
+     *
      * @return array<string, mixed>
      */
     public function for(User $user): array

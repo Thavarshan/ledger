@@ -14,6 +14,8 @@ use InvalidArgumentException;
 final class UpdateTransaction
 {
     /**
+     * Update a transaction while safely validating account reassignment.
+     *
      * @param  array<string, mixed>  $attributes
      */
     public function handle(Transaction $transaction, array $attributes): Transaction

@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 final class AccountIndexQuery
 {
     /**
+     * Build the owner's filtered, sorted, balance-aware account paginator.
+     *
      * @param  array<string, mixed>  $criteria
      * @return LengthAwarePaginator<int, Account>
      */

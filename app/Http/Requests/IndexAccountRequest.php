@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
  */
 class IndexAccountRequest extends FormRequest
 {
+    /** Normalize account filters to their canonical uppercase form. */
     protected function prepareForValidation(): void
     {
         $normalized = [];

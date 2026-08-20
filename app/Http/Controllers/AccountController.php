@@ -24,6 +24,7 @@ use Inertia\Response;
  */
 class AccountController extends Controller
 {
+    /** Display the authenticated user's paginated account list. */
     #[Authorize('viewAny', Account::class)]
     public function index(IndexAccountRequest $request, AccountIndexQuery $accounts): Response
     {
@@ -42,12 +43,14 @@ class AccountController extends Controller
         ]);
     }
 
+    /** Display the account creation form and its enum options. */
     #[Authorize('create', Account::class)]
     public function create(): Response
     {
         return Inertia::render('accounts/create', $this->formOptions());
     }
 
+    /** Create an account owned by the authenticated user. */
     #[Authorize('create', Account::class)]
     public function store(StoreAccountRequest $request, CreateAccount $create): RedirectResponse
     {
@@ -64,12 +67,14 @@ class AccountController extends Controller
         return to_route('accounts.show', $account);
     }
 
+    /** Display one account with its derived balance. */
     #[Authorize('view', 'account')]
     public function show(Account $account): Response
     {
         return Inertia::render('accounts/show', ['account' => AccountResource::make($account->loadBalance())]);
     }
 
+    /** Display the account editing form. */
     #[Authorize('update', 'account')]
     public function edit(Account $account): Response
     {
@@ -79,6 +84,7 @@ class AccountController extends Controller
         ]);
     }
 
+    /** Apply validated changes while preserving account invariants. */
     #[Authorize('update', 'account')]
     public function update(UpdateAccountRequest $request, Account $account, UpdateAccount $update): RedirectResponse
     {
@@ -89,6 +95,7 @@ class AccountController extends Controller
         return to_route('accounts.show', $account);
     }
 
+    /** Delete an account owned by the authenticated user. */
     #[Authorize('delete', 'account')]
     public function destroy(Account $account): RedirectResponse
     {

@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
  */
 abstract class TransactionRequest extends FormRequest
 {
+    /** Normalize direction and timestamp input before validation. */
     protected function prepareForValidation(): void
     {
         $normalized = [];

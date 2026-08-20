@@ -104,6 +104,7 @@ class AccountFactory extends Factory
     /**
      * Generate a numeric string while preserving leading zeroes.
      */
+    /** Generate a numeric string while preserving leading zeroes. */
     private function numericString(int $length): string
     {
         $value = '';

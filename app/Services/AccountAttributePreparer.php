@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 final class AccountAttributePreparer
 {
     /**
+     * Remove client-controlled derived fields and prepare masked identifiers.
+     *
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>
      */

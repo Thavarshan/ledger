@@ -10,6 +10,12 @@ use App\Models\User;
  */
 final class PrimaryAccountManager
 {
+    /**
+     * Clear all primary flags except an optional account.
+     *
+     * The owner row is locked first so the invariant remains safe even when
+     * the owner has no accounts yet and concurrent writes are possible.
+     */
     public function clearFor(User $owner, ?Account $except = null): void
     {
         $exceptId = $except?->getKey();

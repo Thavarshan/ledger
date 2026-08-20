@@ -13,6 +13,8 @@ use InvalidArgumentException;
 final class CreateTransaction
 {
     /**
+     * Create a transaction after locking and validating its active account.
+     *
      * @param  array<string, mixed>  $attributes
      */
     public function handle(User $owner, array $attributes): Transaction

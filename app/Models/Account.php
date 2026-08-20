@@ -161,6 +161,7 @@ class Account extends Model
         );
     }
 
+    /** Convert database aggregate values into safe integer balance components. */
     private static function toInteger(mixed $value): int
     {
         return is_int($value) ? $value : (is_string($value) && is_numeric($value) ? (int) $value : 0);

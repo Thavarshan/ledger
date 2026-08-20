@@ -18,6 +18,8 @@ final class UpdateAccount
     ) {}
 
     /**
+     * Update an account while preserving the primary-account invariant.
+     *
      * @param  array<string, mixed>  $attributes
      */
     public function handle(Account $account, array $attributes): Account

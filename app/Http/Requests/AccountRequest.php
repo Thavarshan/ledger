@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
  */
 abstract class AccountRequest extends FormRequest
 {
+    /** Normalize case-insensitive account codes before validation. */
     protected function prepareForValidation(): void
     {
         $normalized = [];

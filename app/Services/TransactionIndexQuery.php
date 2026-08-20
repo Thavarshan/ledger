@@ -14,6 +14,8 @@ use Illuminate\Support\Carbon;
 final class TransactionIndexQuery
 {
     /**
+     * Build the owner's filtered, sorted, eager-loaded transaction paginator.
+     *
      * @param  array<string, mixed>  $criteria
      * @return LengthAwarePaginator<int, Transaction>
      */

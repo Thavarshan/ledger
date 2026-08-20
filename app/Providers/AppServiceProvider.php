@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
+    /** Configure application-wide framework defaults. */
     public function boot(): void
     {
         $this->configureDefaults();

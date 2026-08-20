@@ -19,6 +19,8 @@ final class CreateAccount
     ) {}
 
     /**
+     * Create an account and maintain the owner's primary-account invariant.
+     *
      * @param  array<string, mixed>  $attributes
      */
     public function handle(User $owner, array $attributes): Account

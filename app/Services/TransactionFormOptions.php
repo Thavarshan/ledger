@@ -13,6 +13,8 @@ use App\Models\User;
 final class TransactionFormOptions
 {
     /**
+     * Build account and direction options for transaction forms.
+     *
      * @return array{accounts: array<int|string, mixed>, directions: list<string|int>}
      */
     public function for(User $owner, ?Transaction $transaction = null): array

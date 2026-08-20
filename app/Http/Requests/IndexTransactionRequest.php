@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
  */
 class IndexTransactionRequest extends FormRequest
 {
+    /** Normalize direction filters before enum validation. */
     protected function prepareForValidation(): void
     {
         if ($this->filled('direction')) {
