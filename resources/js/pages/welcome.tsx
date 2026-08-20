@@ -52,9 +52,9 @@ export default function Welcome() {
             <Head title="Personal finance, simplified" />
 
             <div className="min-h-screen overflow-hidden bg-background text-foreground">
-                <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5 lg:px-8">
+                <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-6 lg:px-8">
                     <Link href={home()} className="flex items-center gap-2.5">
-                        <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/20">
                             <AppLogoIcon className="size-5 fill-current" />
                         </span>
                         <span className="text-base font-semibold tracking-tight">
@@ -72,18 +72,22 @@ export default function Welcome() {
                                 <Link href={login()}>Log in</Link>
                             </Button>
                         )}
-                        <Button
-                            asChild
-                            size="sm"
-                            className="hidden sm:inline-flex"
-                        >
+                        <Button asChild size="sm">
                             <Link href={destination}>{destinationLabel}</Link>
                         </Button>
                     </div>
                 </header>
 
                 <main>
-                    <section className="relative mx-auto grid max-w-6xl gap-14 px-6 pt-14 pb-24 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-20 lg:px-8 lg:pt-24 lg:pb-32">
+                    <section className="relative isolate mx-auto grid max-w-7xl gap-12 px-5 pt-14 pb-20 sm:px-6 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-20 lg:px-8 lg:pt-24 lg:pb-32">
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -top-32 right-0 -z-10 size-[34rem] rounded-full bg-primary/10 blur-3xl dark:bg-primary/15"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute bottom-0 left-0 -z-10 size-64 rounded-full bg-chart-2/10 blur-3xl"
+                        />
                         <div className="relative z-10 flex flex-col items-start">
                             <Badge
                                 variant="secondary"
@@ -92,7 +96,7 @@ export default function Welcome() {
                                 <BadgeCheck className="size-3.5" />
                                 Calm, clear personal finance
                             </Badge>
-                            <h1 className="mt-6 max-w-xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+                            <h1 className="mt-6 max-w-2xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
                                 Make every rupee feel accounted for.
                             </h1>
                             <p className="mt-6 max-w-lg text-lg leading-8 text-muted-foreground">
@@ -101,7 +105,7 @@ export default function Welcome() {
                                 Stay organized today and more confident about
                                 tomorrow.
                             </p>
-                            <div className="mt-8 flex flex-wrap items-center gap-3">
+                            <div className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
                                 <Button asChild size="lg">
                                     <Link href={destination}>
                                         {destinationLabel}
@@ -116,19 +120,20 @@ export default function Welcome() {
                                     </Button>
                                 )}
                             </div>
-                            <p className="mt-5 text-sm text-muted-foreground">
+                            <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+                                <span className="size-1.5 rounded-full bg-emerald-500" />
                                 A focused ledger, without the clutter.
                             </p>
                         </div>
 
-                        <Card className="relative z-10 overflow-hidden border-border/70 bg-card/90 py-0 shadow-xl shadow-primary/5 backdrop-blur">
+                        <Card className="relative z-10 overflow-hidden border-border/70 bg-card/90 py-0 shadow-2xl shadow-primary/10 backdrop-blur-sm">
                             <CardHeader className="border-b bg-muted/35 px-5 py-4 sm:px-6">
                                 <div className="flex items-center justify-between gap-4">
                                     <div>
                                         <CardDescription>
                                             Total balance
                                         </CardDescription>
-                                        <CardTitle className="mt-1 text-3xl tracking-tight">
+                                        <CardTitle className="mt-1 text-2xl tracking-tight sm:text-3xl">
                                             LKR 428,750.00
                                         </CardTitle>
                                     </div>
@@ -201,7 +206,7 @@ export default function Welcome() {
                     </section>
 
                     <section className="border-y bg-muted/30">
-                        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-8">
+                        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
                             <div className="max-w-xl">
                                 <p className="text-sm font-medium text-primary">
                                     A better daily money habit
@@ -235,8 +240,12 @@ export default function Welcome() {
                         </div>
                     </section>
 
-                    <section className="mx-auto max-w-6xl px-6 py-20 lg:px-8">
-                        <Card className="items-center overflow-hidden bg-primary px-6 py-12 text-center text-primary-foreground shadow-lg sm:px-12">
+                    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
+                        <Card className="relative isolate items-center overflow-hidden bg-primary px-6 py-12 text-center text-primary-foreground shadow-lg shadow-primary/20 sm:px-12">
+                            <div
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -top-24 left-1/2 -z-10 size-72 -translate-x-1/2 rounded-full bg-white/15 blur-3xl"
+                            />
                             <WalletCards className="size-8" />
                             <CardHeader className="max-w-xl px-0 text-center">
                                 <CardTitle className="text-3xl tracking-tight text-primary-foreground sm:text-4xl">
