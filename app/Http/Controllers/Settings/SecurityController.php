@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\PasswordUpdateRequest;
 use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
+use App\Models\User;
 use App\Services\SecuritySettingsProps;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -18,11 +19,17 @@ class SecurityController extends Controller
      */
     public function edit(TwoFactorAuthenticationRequest $request, SecuritySettingsProps $props): Response
     {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            abort(401);
+        }
+
         if (Features::canManageTwoFactorAuthentication()) {
             $request->ensureStateIsValid();
         }
 
-        return Inertia::render('settings/security', $props->for($request->user()));
+        return Inertia::render('settings/security', $props->for($user));
     }
 
     /**
@@ -30,7 +37,13 @@ class SecurityController extends Controller
      */
     public function update(PasswordUpdateRequest $request): RedirectResponse
     {
-        $request->user()->update(['password' => $request->string('password')->toString()]);
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            abort(401);
+        }
+
+        $user->update(['password' => $request->string('password')->toString()]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
 

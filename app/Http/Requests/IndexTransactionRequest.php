@@ -15,8 +15,8 @@ class IndexTransactionRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        if ($this->has('direction')) {
-            $this->merge(['direction' => Str::lower((string) $this->input('direction'))]);
+        if ($this->filled('direction')) {
+            $this->merge(['direction' => Str::lower($this->string('direction')->trim()->value())]);
         }
     }
 
@@ -27,6 +27,8 @@ class IndexTransactionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->user()?->getKey();
+
         return [
             'search' => ['nullable', 'string', 'max:100'],
             'sort' => ['nullable', 'string', 'regex:/^(?:occurred_at|amount_minor|description|created_at):(asc|desc)$/i'],
@@ -34,7 +36,7 @@ class IndexTransactionRequest extends FormRequest
                 'nullable',
                 'integer',
                 Rule::exists((new Account)->getTable(), 'id')
-                    ->where('user_id', $this->user()?->getKey()),
+                    ->where('user_id', is_int($userId) || is_string($userId) ? $userId : null),
             ],
             'direction' => ['nullable', Rule::enum(TransactionDirection::class)],
             'occurred_from' => ['nullable', 'date'],

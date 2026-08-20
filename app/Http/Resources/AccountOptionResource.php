@@ -20,10 +20,18 @@ class AccountOptionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $account = $this->resource;
+
+        if (! $account instanceof Account) {
+            throw new \UnexpectedValueException('Account resource expected.');
+        }
+
+        $currencyCode = enum_value($account->currency_code);
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'currency_code' => (string) enum_value($this->currency_code),
+            'id' => $account->id,
+            'name' => $account->name,
+            'currency_code' => is_string($currencyCode) ? $currencyCode : '',
         ];
     }
 }

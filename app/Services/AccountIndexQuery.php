@@ -18,17 +18,23 @@ final class AccountIndexQuery
      */
     public function paginate(User $owner, array $criteria): LengthAwarePaginator
     {
+        $accountType = is_string($criteria['account_type'] ?? null) ? $criteria['account_type'] : null;
+        $countryCode = is_string($criteria['country_code'] ?? null) ? $criteria['country_code'] : null;
+        $currencyCode = is_string($criteria['currency_code'] ?? null) ? $criteria['currency_code'] : null;
+        $search = is_string($criteria['search'] ?? null) ? $criteria['search'] : null;
+        $sort = is_string($criteria['sort'] ?? null) ? $criteria['sort'] : null;
+
         return Account::query()
             ->select([
                 'id', 'user_id', 'name', 'account_type', 'bank_name', 'country_code',
                 'currency_code', 'account_number_last4', 'is_primary', 'is_active', 'created_at',
             ])
             ->whereBelongsTo($owner)
-            ->when($criteria['account_type'] ?? null, fn (Builder $query, string $value): Builder => $query->where('account_type', $value))
-            ->when($criteria['country_code'] ?? null, fn (Builder $query, string $value): Builder => $query->where('country_code', $value))
-            ->when($criteria['currency_code'] ?? null, fn (Builder $query, string $value): Builder => $query->where('currency_code', $value))
-            ->search($criteria['search'] ?? null)
-            ->sorted($criteria['sort'] ?? null)
+            ->when($accountType, fn (Builder $query, mixed $value): Builder => $query->where('account_type', $value))
+            ->when($countryCode, fn (Builder $query, mixed $value): Builder => $query->where('country_code', $value))
+            ->when($currencyCode, fn (Builder $query, mixed $value): Builder => $query->where('currency_code', $value))
+            ->search($search)
+            ->sorted($sort)
             ->withBalance()
             ->paginate(12)
             ->withQueryString();

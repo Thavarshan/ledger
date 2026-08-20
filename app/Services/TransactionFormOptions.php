@@ -13,15 +13,17 @@ use App\Models\User;
 final class TransactionFormOptions
 {
     /**
-     * @return array{accounts: array<int, array<string, mixed>>, directions: list<string|int>}
+     * @return array{accounts: array<int|string, mixed>, directions: list<string|int>}
      */
     public function for(User $owner, ?Transaction $transaction = null): array
     {
+        $transactionAccountId = $transaction?->account_id;
+
         $accounts = $owner->accounts()
             ->select(['id', 'name', 'currency_code'])
-            ->where(function ($query) use ($transaction): void {
+            ->where(function ($query) use ($transactionAccountId): void {
                 $query->active()
-                    ->when($transaction, fn ($query) => $query->orWhere('id', $transaction->account_id));
+                    ->when($transactionAccountId !== null, fn ($query) => $query->orWhere('id', $transactionAccountId));
             })
             ->orderBy('name')
             ->get();

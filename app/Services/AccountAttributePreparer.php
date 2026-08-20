@@ -18,7 +18,11 @@ final class AccountAttributePreparer
         unset($attributes['account_number_last4'], $attributes['user_id']);
 
         if (array_key_exists('account_number', $attributes)) {
-            $attributes['account_number_last4'] = Str::substr((string) $attributes['account_number'], -4);
+            $accountNumber = $attributes['account_number'];
+
+            if (is_string($accountNumber)) {
+                $attributes['account_number_last4'] = Str::substr($accountNumber, -4);
+            }
         }
 
         return $attributes;

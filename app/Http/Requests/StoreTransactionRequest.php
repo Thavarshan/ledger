@@ -8,9 +8,6 @@ namespace App\Http\Requests;
 class StoreTransactionRequest extends TransactionRequest
 {
     /**
-     * Prepare normalized transaction values for validation.
-     */
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, array<int, mixed>>

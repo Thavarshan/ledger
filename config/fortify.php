@@ -2,6 +2,9 @@
 
 use Laravel\Fortify\Features;
 
+$appUrl = config('app.url');
+$appUrl = is_string($appUrl) ? $appUrl : '';
+
 return [
 
     /*
@@ -143,8 +146,8 @@ return [
     */
 
     'passkeys' => [
-        'relying_party_id' => parse_url(config('app.url'), PHP_URL_HOST),
-        'allowed_origins' => [config('app.url')],
+        'relying_party_id' => parse_url($appUrl, PHP_URL_HOST),
+        'allowed_origins' => [$appUrl],
         'user_handle_secret' => env('PASSKEYS_USER_HANDLE_SECRET', config('app.key')),
         'timeout' => 60000,
     ],

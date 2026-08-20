@@ -24,31 +24,40 @@ class AccountResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $account = $this->resource;
+
+        if (! $account instanceof Account) {
+            throw new \UnexpectedValueException('Account resource expected.');
+        }
+
+        $accountType = enum_value($account->account_type);
+        $currencyCode = enum_value($account->currency_code);
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'account_type' => (string) enum_value($this->account_type),
-            'account_holder_name' => $this->account_holder_name,
-            'bank_name' => $this->bank_name,
-            'bank_code' => $this->bank_code,
-            'branch_name' => $this->branch_name,
-            'branch_code' => $this->branch_code,
-            'country_code' => $this->country_code,
-            'currency_code' => (string) enum_value($this->currency_code),
-            'account_number_last4' => $this->account_number_last4,
-            'has_iban' => filled($this->iban),
-            'swift_bic' => $this->swift_bic,
-            'has_routing_number' => filled($this->routing_number),
-            'has_sort_code' => filled($this->sort_code),
-            'notes' => $this->notes,
-            'is_primary' => $this->is_primary,
-            'is_active' => $this->is_active,
+            'id' => $account->id,
+            'name' => $account->name,
+            'account_type' => is_string($accountType) ? $accountType : '',
+            'account_holder_name' => $account->account_holder_name,
+            'bank_name' => $account->bank_name,
+            'bank_code' => $account->bank_code,
+            'branch_name' => $account->branch_name,
+            'branch_code' => $account->branch_code,
+            'country_code' => $account->country_code,
+            'currency_code' => is_string($currencyCode) ? $currencyCode : '',
+            'account_number_last4' => $account->account_number_last4,
+            'has_iban' => filled($account->iban),
+            'swift_bic' => $account->swift_bic,
+            'has_routing_number' => filled($account->routing_number),
+            'has_sort_code' => filled($account->sort_code),
+            'notes' => $account->notes,
+            'is_primary' => $account->is_primary,
+            'is_active' => $account->is_active,
             'balance_minor' => $this->when(
-                $this->balance_minor !== null,
-                fn (): string => (string) $this->balance_minor,
+                $account->balance_minor !== null,
+                fn (): string => (string) $account->balance_minor,
             ),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $account->created_at?->toISOString(),
+            'updated_at' => $account->updated_at?->toISOString(),
         ];
     }
 }

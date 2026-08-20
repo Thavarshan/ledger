@@ -20,15 +20,23 @@ class AccountSummaryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $account = $this->resource;
+
+        if (! $account instanceof Account) {
+            throw new \UnexpectedValueException('Account resource expected.');
+        }
+
+        $currencyCode = enum_value($account->currency_code);
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'bank_name' => $this->bank_name,
-            'currency_code' => (string) enum_value($this->currency_code),
-            'account_number_last4' => $this->account_number_last4,
-            'is_primary' => $this->is_primary,
-            'is_active' => $this->is_active,
-            'balance_minor' => (string) $this->balance_minor,
+            'id' => $account->id,
+            'name' => $account->name,
+            'bank_name' => $account->bank_name,
+            'currency_code' => is_string($currencyCode) ? $currencyCode : '',
+            'account_number_last4' => $account->account_number_last4,
+            'is_primary' => $account->is_primary,
+            'is_active' => $account->is_active,
+            'balance_minor' => (string) ($account->balance_minor ?? 0),
         ];
     }
 }

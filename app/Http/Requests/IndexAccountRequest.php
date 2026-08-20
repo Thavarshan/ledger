@@ -18,8 +18,8 @@ class IndexAccountRequest extends FormRequest
         $normalized = [];
 
         foreach (['country_code', 'currency_code'] as $field) {
-            if ($this->has($field)) {
-                $normalized[$field] = Str::upper((string) $this->input($field));
+            if ($this->filled($field)) {
+                $normalized[$field] = Str::upper($this->string($field)->trim()->value());
             }
         }
 

@@ -12,13 +12,14 @@ final class PrimaryAccountManager
 {
     public function clearFor(User $owner, ?Account $except = null): void
     {
-        $accounts = Account::query()->whereBelongsTo($owner)->lockForUpdate();
+        $exceptId = $except?->getKey();
 
-        $accounts->get(['id']);
+        $owner->newQuery()->whereKey($owner->getKey())->lockForUpdate()->firstOrFail();
 
-        $accounts
+        Account::query()
+            ->whereBelongsTo($owner)
             ->where('is_primary', true)
-            ->when($except, fn ($query) => $query->whereKeyNot($except->getKey()))
+            ->when($exceptId !== null, fn ($query) => $query->whereKeyNot($exceptId))
             ->update(['is_primary' => false]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\TransactionDirection;
 use App\Models\Account;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -17,12 +18,12 @@ abstract class TransactionRequest extends FormRequest
     {
         $normalized = [];
 
-        if ($this->has('direction')) {
-            $normalized['direction'] = Str::lower((string) $this->input('direction'));
+        if ($this->filled('direction')) {
+            $normalized['direction'] = Str::lower($this->string('direction')->trim()->value());
         }
 
-        if ($this->has('occurred_at')) {
-            $normalized['occurred_at'] = trim((string) $this->input('occurred_at'));
+        if ($this->filled('occurred_at')) {
+            $normalized['occurred_at'] = $this->string('occurred_at')->trim()->value();
         }
 
         $this->merge($normalized);
@@ -34,16 +35,17 @@ abstract class TransactionRequest extends FormRequest
     protected function transactionRules(bool $partial, ?int $currentAccountId = null): array
     {
         $required = $partial ? ['sometimes', 'required'] : ['required'];
+        $userId = $this->user()?->getKey();
 
         return [
             'account_id' => [
                 ...$required,
                 'integer',
                 Rule::exists((new Account)->getTable(), 'id')
-                    ->where('user_id', $this->user()?->getKey())
-                    ->where(function ($query) use ($currentAccountId): void {
+                    ->where('user_id', is_int($userId) || is_string($userId) ? $userId : null)
+                    ->where(function (Builder $query) use ($currentAccountId): void {
                         $query->where('is_active', true)
-                            ->when($currentAccountId, fn ($query) => $query->orWhere('id', $currentAccountId));
+                            ->when($currentAccountId, fn (Builder $query): Builder => $query->orWhere('id', $currentAccountId));
                     }),
             ],
             'direction' => [...$required, 'string', Rule::enum(TransactionDirection::class)],

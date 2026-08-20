@@ -19,6 +19,14 @@ final class TransactionIndexQuery
      */
     public function paginate(User $owner, array $criteria): LengthAwarePaginator
     {
+        $accountId = $criteria['account_id'] ?? null;
+        $accountId = is_int($accountId) || is_string($accountId) ? $accountId : null;
+        $direction = is_string($criteria['direction'] ?? null) ? $criteria['direction'] : null;
+        $occurredFrom = is_string($criteria['occurred_from'] ?? null) ? $criteria['occurred_from'] : null;
+        $occurredTo = is_string($criteria['occurred_to'] ?? null) ? $criteria['occurred_to'] : null;
+        $search = is_string($criteria['search'] ?? null) ? $criteria['search'] : null;
+        $sort = is_string($criteria['sort'] ?? null) ? $criteria['sort'] : null;
+
         return Transaction::query()
             ->select([
                 'id', 'account_id', 'direction', 'amount_minor', 'description', 'reference', 'notes',
@@ -26,12 +34,12 @@ final class TransactionIndexQuery
             ])
             ->ownedBy($owner)
             ->with('account:id,name,currency_code')
-            ->when($criteria['account_id'] ?? null, fn (Builder $query, int|string $value): Builder => $query->where('account_id', $value))
-            ->when($criteria['direction'] ?? null, fn (Builder $query, string $value): Builder => $query->where('direction', $value))
-            ->when($criteria['occurred_from'] ?? null, fn (Builder $query, string $value): Builder => $query->where('occurred_at', '>=', Carbon::parse($value)->startOfDay()))
-            ->when($criteria['occurred_to'] ?? null, fn (Builder $query, string $value): Builder => $query->where('occurred_at', '<=', Carbon::parse($value)->endOfDay()))
-            ->search($criteria['search'] ?? null)
-            ->sorted($criteria['sort'] ?? null)
+            ->when($accountId, fn (Builder $query, mixed $value): Builder => $query->where('account_id', $value))
+            ->when($direction, fn (Builder $query, mixed $value): Builder => $query->where('direction', $value))
+            ->when($occurredFrom, fn (Builder $query, mixed $value): Builder => $query->where('occurred_at', '>=', Carbon::parse((string) $value)->startOfDay()))
+            ->when($occurredTo, fn (Builder $query, mixed $value): Builder => $query->where('occurred_at', '<=', Carbon::parse((string) $value)->endOfDay()))
+            ->search($search)
+            ->sorted($sort)
             ->paginate(12)
             ->withQueryString();
     }

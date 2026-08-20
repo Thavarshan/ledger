@@ -60,7 +60,8 @@ class AccountFactory extends Factory
     {
         return $this->state(function (array $attributes): array {
             $accountNumber = $this->numericString(12);
-            $countryCode = fake()->randomElement(['AU', 'CA', 'GB', 'IN', 'SG', 'US']);
+            $countryCodeValue = fake()->randomElement(['AU', 'CA', 'GB', 'IN', 'SG', 'US']);
+            $countryCode = is_string($countryCodeValue) ? $countryCodeValue : 'US';
 
             return [
                 'country_code' => $countryCode,

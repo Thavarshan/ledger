@@ -22,18 +22,29 @@ class TransactionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $transaction = $this->resource;
+
+        if (! $transaction instanceof Transaction) {
+            throw new \UnexpectedValueException('Transaction resource expected.');
+        }
+
+        $direction = enum_value($transaction->direction);
+
         return [
-            'id' => $this->id,
-            'account_id' => $this->account_id,
-            'direction' => (string) enum_value($this->direction),
-            'amount_minor' => (string) $this->amount_minor,
-            'description' => $this->description,
-            'reference' => $this->reference,
-            'notes' => $this->notes,
-            'occurred_at' => $this->occurred_at->toISOString(),
-            'account' => $this->whenLoaded('account', fn (): array => AccountOptionResource::make($this->account)->resolve($request)),
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'id' => $transaction->id,
+            'account_id' => $transaction->account_id,
+            'direction' => is_string($direction) ? $direction : '',
+            'amount_minor' => (string) $transaction->amount_minor,
+            'description' => $transaction->description,
+            'reference' => $transaction->reference,
+            'notes' => $transaction->notes,
+            'occurred_at' => $transaction->occurred_at->toISOString(),
+            'account' => $this->whenLoaded(
+                'account',
+                fn (): array => AccountOptionResource::make($transaction->account)->resolve($request),
+            ),
+            'created_at' => $transaction->created_at?->toISOString(),
+            'updated_at' => $transaction->updated_at?->toISOString(),
         ];
     }
 }

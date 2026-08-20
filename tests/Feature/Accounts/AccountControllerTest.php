@@ -217,6 +217,25 @@ class AccountControllerTest extends TestCase
         $this->assertSame('999988887777', $account->account_number);
     }
 
+    public function test_nullable_account_fields_can_be_cleared(): void
+    {
+        $user = User::factory()->create();
+        $account = Account::factory()->for($user)->foreign()->create([
+            'iban' => 'GB82WEST12345698765432',
+            'swift_bic' => 'BCEYLKLX',
+        ]);
+
+        $response = $this->actingAs($user)->put(route('accounts.update', $account), [
+            'iban' => '',
+            'swift_bic' => '',
+        ]);
+
+        $response->assertRedirect(route('accounts.show', $account));
+        $account->refresh();
+        $this->assertNull($account->iban);
+        $this->assertNull($account->swift_bic);
+    }
+
     public function test_owner_can_delete_an_account(): void
     {
         $user = User::factory()->create();

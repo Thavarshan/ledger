@@ -12,6 +12,7 @@ use App\Http\Requests\UpdateAccountRequest;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSummaryResource;
 use App\Models\Account;
+use App\Models\User;
 use App\Services\AccountIndexQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Attributes\Controllers\Authorize;
@@ -26,9 +27,15 @@ class AccountController extends Controller
     #[Authorize('viewAny', Account::class)]
     public function index(IndexAccountRequest $request, AccountIndexQuery $accounts): Response
     {
+        $owner = $request->user();
+
+        if (! $owner instanceof User) {
+            abort(401);
+        }
+
         return Inertia::render('accounts/index', [
             'accounts' => AccountSummaryResource::collection($accounts->paginate(
-                $request->user(),
+                $owner,
                 $request->validated(),
             )),
             ...$this->formOptions(),
@@ -44,7 +51,13 @@ class AccountController extends Controller
     #[Authorize('create', Account::class)]
     public function store(StoreAccountRequest $request, CreateAccount $create): RedirectResponse
     {
-        $account = $create->handle($request->user(), $request->validated());
+        $owner = $request->user();
+
+        if (! $owner instanceof User) {
+            abort(401);
+        }
+
+        $account = $create->handle($owner, $request->validated());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Account created.')]);
 

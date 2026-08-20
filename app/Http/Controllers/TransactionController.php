@@ -9,6 +9,7 @@ use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Services\TransactionFormOptions;
 use App\Services\TransactionIndexQuery;
 use Illuminate\Http\RedirectResponse;
@@ -25,25 +26,43 @@ class TransactionController extends Controller
     #[Authorize('viewAny', Transaction::class)]
     public function index(IndexTransactionRequest $request, TransactionIndexQuery $transactions, TransactionFormOptions $options): Response
     {
+        $owner = $request->user();
+
+        if (! $owner instanceof User) {
+            abort(401);
+        }
+
         return Inertia::render('transactions/index', [
             'transactions' => TransactionResource::collection($transactions->paginate(
-                $request->user(),
+                $owner,
                 $request->validated(),
             )),
-            ...$options->for($request->user()),
+            ...$options->for($owner),
         ]);
     }
 
     #[Authorize('create', Transaction::class)]
     public function create(Request $request, TransactionFormOptions $options): Response
     {
-        return Inertia::render('transactions/create', $options->for($request->user()));
+        $owner = $request->user();
+
+        if (! $owner instanceof User) {
+            abort(401);
+        }
+
+        return Inertia::render('transactions/create', $options->for($owner));
     }
 
     #[Authorize('create', Transaction::class)]
     public function store(StoreTransactionRequest $request, CreateTransaction $create): RedirectResponse
     {
-        $transaction = $create->handle($request->user(), $request->validated());
+        $owner = $request->user();
+
+        if (! $owner instanceof User) {
+            abort(401);
+        }
+
+        $transaction = $create->handle($owner, $request->validated());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Transaction created.')]);
 
@@ -61,8 +80,14 @@ class TransactionController extends Controller
     #[Authorize('update', 'transaction')]
     public function edit(Request $request, Transaction $transaction, TransactionFormOptions $options): Response
     {
+        $owner = $request->user();
+
+        if (! $owner instanceof User) {
+            abort(401);
+        }
+
         return Inertia::render('transactions/edit', [
-            ...$options->for($request->user(), $transaction),
+            ...$options->for($owner, $transaction),
             'transaction' => TransactionResource::make($transaction->load('account:id,name,currency_code')),
         ]);
     }

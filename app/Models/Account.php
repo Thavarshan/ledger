@@ -155,9 +155,15 @@ class Account extends Model
                     return null;
                 }
 
-                return (int) $attributes['credit_total_minor'] - (int) $attributes['debit_total_minor'];
+                return self::toInteger($attributes['credit_total_minor'])
+                    - self::toInteger($attributes['debit_total_minor']);
             },
         );
+    }
+
+    private static function toInteger(mixed $value): int
+    {
+        return is_int($value) ? $value : (is_string($value) && is_numeric($value) ? (int) $value : 0);
     }
 
     /**
